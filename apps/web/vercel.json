@@ -1,6 +1,6 @@
 {
   "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
-  "buildCommand": "cd ../.. && pnpm --filter @materiaux/web build",
-  "outputDirectory": "apps/web/dist",
+  "buildCommand": "../../node_modules/.bin/vite build",
+  "outputDirectory": "dist",
   "rewrites": [{ "source": "/((?!assets/).*)", "destination": "/index.html" }]
 }
