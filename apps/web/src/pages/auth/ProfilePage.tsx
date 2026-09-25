@@ -95,7 +95,7 @@ export default function ProfilePage() {
         </div>
 
         {pwSuccess && (
-          <Alert type="success" className="mb-4">
+          <Alert variant="success" className="mb-4">
             <div className="flex items-center gap-2">
               <CheckCircle size={16} />
               Mot de passe modifié avec succès.
@@ -103,7 +103,7 @@ export default function ProfilePage() {
           </Alert>
         )}
         {pwError && (
-          <Alert type="error" className="mb-4">
+          <Alert variant="danger" className="mb-4">
             {pwError}
           </Alert>
         )}
@@ -160,7 +160,7 @@ export default function ProfilePage() {
 
           {pushState === 'subscribed' ? (
             <button
-              onClick={unsubscribe}
+              onClick={() => unsubscribe.mutate()}
               className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-danger-50 text-danger-600 text-sm font-medium"
             >
               <BellOff size={16} />
@@ -168,7 +168,7 @@ export default function ProfilePage() {
             </button>
           ) : (
             <button
-              onClick={subscribe}
+              onClick={() => subscribe.mutate()}
               disabled={
                 pushState === 'unsupported' || pushState === 'denied' || pushState === 'loading'
               }
