@@ -1,8 +1,16 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { useAuthStore } from '../stores/authStore';
 
+function cleanEnvUrl(raw: string): string {
+  // Strip BOM (0xFEFF) that PowerShell adds, and trailing whitespace from cmd.exe
+  const s = raw.charCodeAt(0) === 0xfeff ? raw.slice(1) : raw;
+  return s.trim();
+}
+
+const apiBase = cleanEnvUrl(import.meta.env.VITE_API_URL ?? '');
+
 export const api = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL ?? ''}/api/v1`,
+  baseURL: `${apiBase}/api/v1`,
   headers: { 'Content-Type': 'application/json' },
   timeout: 15_000, // 15s — adapté réseau 3G
 });
@@ -46,10 +54,7 @@ api.interceptors.response.use(
 
       isRefreshing = true;
       try {
-        const { data } = await axios.post(
-          `${import.meta.env.VITE_API_URL ?? ''}/api/v1/auth/refresh`,
-          { refreshToken }
-        );
+        const { data } = await axios.post(`${apiBase}/api/v1/auth/refresh`, { refreshToken });
         const newToken = data.data.accessToken;
         useAuthStore.getState().setAccessToken(newToken);
         pendingRequests.forEach((cb) => cb(newToken));
