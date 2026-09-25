@@ -29,6 +29,9 @@ import pushRoutes from './routes/push.routes';
 
 const app: Application = express();
 
+// Requis derrière un reverse proxy (Vercel, Nginx) pour express-rate-limit
+app.set('trust proxy', 1);
+
 // ── Sécurité ──────────────────────────────────────────────────────────────────
 app.use(helmet());
 app.use(cors(corsOptions));
@@ -58,9 +61,11 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 // ── Health check ──────────────────────────────────────────────────────────────
-app.get('/health', (_req: Request, res: Response) => {
+const healthHandler = (_req: Request, res: Response) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
+};
+app.get('/health', healthHandler);
+app.get('/api/v1/health', healthHandler);
 
 // ── Routes API ────────────────────────────────────────────────────────────────
 const V1 = '/api/v1';
