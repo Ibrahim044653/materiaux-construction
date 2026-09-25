@@ -1,13 +1,13 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, ShoppingCart, Package, Users, BarChart3 } from 'lucide-react';
+import { LayoutDashboard, ShoppingCart, ClipboardList, Boxes, BarChart3 } from 'lucide-react';
 import { clsx } from 'clsx';
 
 const mobileNavItems = [
   { to: '/tableau-de-bord', icon: LayoutDashboard, label: 'Accueil' },
-  { to: '/caisse',          icon: ShoppingCart,    label: 'Caisse' },
-  { to: '/stocks',          icon: Package,         label: 'Stocks' },
-  { to: '/clients',         icon: Users,           label: 'Clients' },
-  { to: '/rapports',        icon: BarChart3,       label: 'Rapports' },
+  { to: '/caisse', icon: ShoppingCart, label: 'Caisse' },
+  { to: '/ventes', icon: ClipboardList, label: 'Ventes' },
+  { to: '/stock', icon: Boxes, label: 'Stock' },
+  { to: '/rapports', icon: BarChart3, label: 'Rapports' },
 ];
 
 export function MobileNav() {

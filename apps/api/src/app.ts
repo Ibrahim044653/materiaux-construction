@@ -21,6 +21,11 @@ import customerRoutes from './routes/customer.routes';
 import supplierRoutes from './routes/supplier.routes';
 import dashboardRoutes from './routes/dashboard.routes';
 import reportRoutes from './routes/report.routes';
+import twoFactorRoutes from './routes/twoFactor.routes';
+import auditLogRoutes from './routes/auditLog.routes';
+import adminRoutes from './routes/admin.routes';
+import exportRoutes from './routes/export.routes';
+import pushRoutes from './routes/push.routes';
 
 const app: Application = express();
 
@@ -37,17 +42,6 @@ const globalLimiter = rateLimit({
   message: { success: false, message: 'Trop de requêtes. Réessayez dans 15 minutes.' },
 });
 app.use(globalLimiter);
-
-// ── Auth rate limiter (plus strict) ──────────────────────────────────────────
-export const authLimiter = rateLimit({
-  windowMs: 30 * 60 * 1000,
-  max: 5,
-  skipSuccessfulRequests: true,
-  message: {
-    success: false,
-    message: 'Compte temporairement bloqué après 5 tentatives. Réessayez dans 30 minutes.',
-  },
-});
 
 // ── Body parsing ──────────────────────────────────────────────────────────────
 app.use(express.json({ limit: '10mb' }));
@@ -82,6 +76,11 @@ app.use(`${V1}/customers`, customerRoutes);
 app.use(`${V1}/suppliers`, supplierRoutes);
 app.use(`${V1}/dashboard`, dashboardRoutes);
 app.use(`${V1}/reports`, reportRoutes);
+app.use(`${V1}/auth/2fa`, twoFactorRoutes);
+app.use(`${V1}/audit-logs`, auditLogRoutes);
+app.use(`${V1}/admin`, adminRoutes);
+app.use(`${V1}/reports/export`, exportRoutes);
+app.use(`${V1}/push`, pushRoutes);
 
 // ── 404 + Gestionnaire d'erreurs ──────────────────────────────────────────────
 app.use(notFound);

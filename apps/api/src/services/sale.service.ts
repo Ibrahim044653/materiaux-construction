@@ -2,6 +2,7 @@ import { Prisma } from '@prisma/client';
 import { prisma } from '../config/prisma';
 import { AppError } from '../middlewares/errorHandler';
 import { StockService } from './stock.service';
+import { pushService } from './push.service';
 
 const stockService = new StockService();
 
@@ -54,20 +55,33 @@ export class SaleService {
       }),
       prisma.sale.count({ where }),
     ]);
-    return { data, meta: { page: opts.page, perPage: opts.perPage, total, totalPages: Math.ceil(total / opts.perPage) } };
+    return {
+      data,
+      meta: {
+        page: opts.page,
+        perPage: opts.perPage,
+        total,
+        totalPages: Math.ceil(total / opts.perPage),
+      },
+    };
   }
 
   async create(tenantId: string, cashierId: string, input: CreateSaleInput) {
     // Calculer les totaux
     let subtotal = new Prisma.Decimal(0);
     const itemsData: Array<{
-      productId: string; productName: string;
-      quantity: Prisma.Decimal; unitPrice: Prisma.Decimal;
-      discount: Prisma.Decimal; total: Prisma.Decimal;
+      productId: string;
+      productName: string;
+      quantity: Prisma.Decimal;
+      unitPrice: Prisma.Decimal;
+      discount: Prisma.Decimal;
+      total: Prisma.Decimal;
     }> = [];
 
     for (const item of input.items) {
-      const product = await prisma.product.findFirst({ where: { id: item.productId, tenantId, isActive: true } });
+      const product = await prisma.product.findFirst({
+        where: { id: item.productId, tenantId, isActive: true },
+      });
       if (!product) throw new AppError(`Produit introuvable : ${item.productId}`, 404);
 
       const qty = new Prisma.Decimal(item.quantity);
@@ -76,7 +90,14 @@ export class SaleService {
       const lineTotal = price.minus(disc).times(qty);
       subtotal = subtotal.plus(lineTotal);
 
-      itemsData.push({ productId: item.productId, productName: product.name, quantity: qty, unitPrice: price, discount: disc, total: lineTotal });
+      itemsData.push({
+        productId: item.productId,
+        productName: product.name,
+        quantity: qty,
+        unitPrice: price,
+        discount: disc,
+        total: lineTotal,
+      });
     }
 
     const globalDiscount = new Prisma.Decimal(input.globalDiscount);
@@ -91,7 +112,7 @@ export class SaleService {
 
     const receiptNumber = await generateReceiptNumber(tenantId);
 
-    return prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
       const sale = await tx.sale.create({
         data: {
           tenantId,
@@ -119,7 +140,11 @@ export class SaleService {
 
       // Déduire le stock
       await stockService.deductSaleStock(
-        tx, tenantId, input.storeId, cashierId, sale.id,
+        tx,
+        tenantId,
+        input.storeId,
+        cashierId,
+        sale.id,
         itemsData.map((i) => ({ productId: i.productId, quantity: i.quantity }))
       );
 
@@ -133,6 +158,33 @@ export class SaleService {
 
       return sale;
     });
+
+    // Fire stock alerts asynchronously after transaction (non-blocking)
+    setImmediate(async () => {
+      try {
+        for (const item of itemsData) {
+          const entry = await prisma.stockEntry.findUnique({
+            where: { productId_storeId: { productId: item.productId, storeId: input.storeId } },
+            include: {
+              product: { select: { name: true } },
+              store: { select: { name: true } },
+            },
+          });
+          if (entry && entry.quantity.lte(entry.alertThreshold)) {
+            await pushService.sendStockAlert(
+              tenantId,
+              (entry.product as { name: string }).name,
+              (entry.store as { name: string }).name,
+              Number(entry.quantity)
+            );
+          }
+        }
+      } catch {
+        /* silently ignore push errors */
+      }
+    });
+
+    return result;
   }
 
   async getById(tenantId: string, id: string) {
@@ -169,8 +221,15 @@ export class SaleService {
       let totalRefund = new Prisma.Decimal(0);
 
       for (const ret of input.items) {
-        const saleItem = (sale.items as Array<{ id: string; productId: string; quantity: Prisma.Decimal; unitPrice: Prisma.Decimal; discount: Prisma.Decimal }>)
-          .find((i) => i.id === ret.saleItemId);
+        const saleItem = (
+          sale.items as Array<{
+            id: string;
+            productId: string;
+            quantity: Prisma.Decimal;
+            unitPrice: Prisma.Decimal;
+            discount: Prisma.Decimal;
+          }>
+        ).find((i) => i.id === ret.saleItemId);
         if (!saleItem) throw new AppError(`Article de vente introuvable : ${ret.saleItemId}`, 404);
         if (new Prisma.Decimal(ret.quantity).gt(saleItem.quantity)) {
           throw new AppError('Quantité retournée supérieure à la quantité vendue', 400);
@@ -187,10 +246,14 @@ export class SaleService {
 
         await tx.stockMovement.create({
           data: {
-            tenantId, productId: saleItem.productId, storeId: sale.storeId,
-            type: 'IN', quantity: new Prisma.Decimal(ret.quantity),
+            tenantId,
+            productId: saleItem.productId,
+            storeId: sale.storeId,
+            type: 'IN',
+            quantity: new Prisma.Decimal(ret.quantity),
             reason: `Retour vente ${sale.receiptNumber}`,
-            referenceId: saleId, createdById: userId,
+            referenceId: saleId,
+            createdById: userId,
           },
         });
       }

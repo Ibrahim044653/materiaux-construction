@@ -7,6 +7,9 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'icons/*.png'],
       manifest: {
@@ -24,21 +27,8 @@ export default defineConfig({
           { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
-      workbox: {
-        // Mise en cache des assets statiques
+      injectManifest: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
-        runtimeCaching: [
-          {
-            urlPattern: /^https?:\/\/.*\/api\/v1\/dashboard/,
-            handler: 'NetworkFirst',
-            options: { cacheName: 'api-dashboard', expiration: { maxAgeSeconds: 300 } },
-          },
-          {
-            urlPattern: /^https?:\/\/.*\/api\/v1\/products/,
-            handler: 'StaleWhileRevalidate',
-            options: { cacheName: 'api-products', expiration: { maxAgeSeconds: 3600 } },
-          },
-        ],
       },
     }),
   ],

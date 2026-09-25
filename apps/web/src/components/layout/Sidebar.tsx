@@ -1,18 +1,29 @@
 import { NavLink } from 'react-router-dom';
 import {
-  LayoutDashboard, ShoppingCart, Package, Users, Truck, BarChart3,
-  LogOut, Settings, X,
+  LayoutDashboard,
+  ShoppingCart,
+  Package,
+  Boxes,
+  Users,
+  Truck,
+  BarChart3,
+  ClipboardList,
+  LogOut,
+  Settings,
+  X,
 } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { clsx } from 'clsx';
 
 const navItems = [
   { to: '/tableau-de-bord', icon: LayoutDashboard, label: 'Tableau de bord' },
-  { to: '/caisse',          icon: ShoppingCart,    label: 'Caisse' },
-  { to: '/stocks',          icon: Package,         label: 'Stocks' },
-  { to: '/clients',         icon: Users,           label: 'Clients' },
-  { to: '/fournisseurs',    icon: Truck,           label: 'Fournisseurs' },
-  { to: '/rapports',        icon: BarChart3,       label: 'Rapports' },
+  { to: '/caisse', icon: ShoppingCart, label: 'Caisse' },
+  { to: '/ventes', icon: ClipboardList, label: 'Ventes' },
+  { to: '/stock', icon: Boxes, label: 'Stock' },
+  { to: '/produits', icon: Package, label: 'Produits' },
+  { to: '/clients', icon: Users, label: 'Clients' },
+  { to: '/fournisseurs', icon: Truck, label: 'Fournisseurs' },
+  { to: '/rapports', icon: BarChart3, label: 'Rapports' },
 ];
 
 interface SidebarProps {

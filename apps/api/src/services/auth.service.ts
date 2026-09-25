@@ -8,16 +8,35 @@ import { Role } from '@materiaux/shared';
 
 export class AuthService {
   async login(email: string, password: string) {
-    const user = await prisma.user.findUnique({
-      where: { email: email.toLowerCase() },
-      include: { tenant: { select: { id: true, status: true } } },
-    });
+    const rows = await prisma.$queryRawUnsafe<
+      {
+        id: string;
+        email: string;
+        name: string;
+        role: string;
+        tenantId: string | null;
+        storeId: string | null;
+        passwordHash: string;
+        isActive: boolean;
+        twoFactorEnabled: boolean;
+        tenantStatus: string | null;
+      }[]
+    >(
+      `SELECT u.id, u.email, u.name, u.role, u."tenantId", u."storeId",
+              u."passwordHash", u."isActive", u."twoFactorEnabled",
+              t.status as "tenantStatus"
+       FROM users u
+       LEFT JOIN tenants t ON t.id = u."tenantId"
+       WHERE u.email = $1`,
+      email.toLowerCase()
+    );
+    const user = rows[0];
 
     if (!user || !user.isActive) {
       throw new AppError('Email ou mot de passe incorrect', 401);
     }
 
-    if (user.tenant && user.tenant.status === 'SUSPENDED') {
+    if (user.tenantStatus === 'SUSPENDED') {
       throw new AppError("Ce compte a été suspendu. Contactez l'administrateur.", 403);
     }
 
@@ -26,7 +45,52 @@ export class AuthService {
       throw new AppError('Email ou mot de passe incorrect', 401);
     }
 
-    // Réinitialiser le compteur de tentatives après succès
+    // Si 2FA activée, retourner un indicateur — le client appellera /auth/login/2fa
+    if (user.twoFactorEnabled) {
+      return {
+        requiresTwoFactor: true,
+        userId: user.id,
+        accessToken: null,
+        refreshToken: null,
+        user: null,
+      };
+    }
+
+    return this._issueTokens(user);
+  }
+
+  async loginWith2FA(userId: string, totpToken: string) {
+    const { twoFactorService } = await import('./twoFactor.service');
+    await twoFactorService.validateLogin(userId, totpToken);
+
+    const rows = await prisma.$queryRawUnsafe<
+      {
+        id: string;
+        email: string;
+        name: string;
+        role: string;
+        tenantId: string | null;
+        storeId: string | null;
+        isActive: boolean;
+      }[]
+    >(
+      `SELECT id, email, name, role, "tenantId", "storeId", "isActive" FROM users WHERE id = $1`,
+      userId
+    );
+    const user = rows[0];
+    if (!user || !user.isActive) throw new AppError('Utilisateur introuvable', 404);
+
+    return this._issueTokens(user);
+  }
+
+  private async _issueTokens(user: {
+    id: string;
+    email: string;
+    name: string;
+    role: string;
+    tenantId: string | null;
+    storeId: string | null;
+  }) {
     await prisma.user.update({
       where: { id: user.id },
       data: { lastLoginAt: new Date() },
@@ -47,7 +111,6 @@ export class AuthService {
       expiresIn: jwtConfig.refreshExpiresIn,
     });
 
-    // Stocker le refresh token hashé en base
     const hashedRefresh = await bcrypt.hash(refreshToken, 10);
     await prisma.refreshToken.create({
       data: {
@@ -58,6 +121,7 @@ export class AuthService {
     });
 
     return {
+      requiresTwoFactor: false,
       accessToken,
       refreshToken,
       user: {

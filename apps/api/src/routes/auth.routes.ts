@@ -1,5 +1,5 @@
 import { Router, type IRouter } from 'express';
-import { authLimiter } from '../app';
+import { authLimiter } from '../middlewares/rateLimiter';
 import { AuthController } from '../controllers/auth.controller';
 import { authenticate } from '../middlewares/authenticate';
 
@@ -8,6 +8,7 @@ const ctrl = new AuthController();
 
 // Routes publiques (limitées)
 router.post('/login', authLimiter, ctrl.login);
+router.post('/login/2fa', authLimiter, ctrl.loginWith2FA);
 router.post('/refresh', ctrl.refresh);
 router.post('/logout', authenticate, ctrl.logout);
 router.post('/forgot-password', authLimiter, ctrl.forgotPassword);

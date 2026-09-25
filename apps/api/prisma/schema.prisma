@@ -112,26 +112,29 @@ model Tenant {
 // ─────────────────────────────────────────────────────────────
 
 model User {
-  id           String    @id @default(cuid())
-  tenantId     String?
-  storeId      String?
-  email        String    @unique
-  name         String
-  phone        String?
-  avatar       String?
-  passwordHash String
-  role         Role      @default(CASHIER)
-  isActive     Boolean   @default(true)
-  lastLoginAt  DateTime?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id                String    @id @default(cuid())
+  tenantId          String?
+  storeId           String?
+  email             String    @unique
+  name              String
+  phone             String?
+  avatar            String?
+  passwordHash      String
+  role              Role      @default(CASHIER)
+  isActive          Boolean   @default(true)
+  twoFactorEnabled  Boolean   @default(false)
+  twoFactorSecret   String?
+  lastLoginAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
-  tenant        Tenant?        @relation(fields: [tenantId], references: [id])
-  store         Store?         @relation(fields: [storeId], references: [id])
-  refreshTokens RefreshToken[]
+  tenant         Tenant?        @relation(fields: [tenantId], references: [id])
+  store          Store?         @relation(fields: [storeId], references: [id])
+  refreshTokens  RefreshToken[]
   passwordResets PasswordReset[]
-  sales         Sale[]         @relation("SaleCashier")
+  sales          Sale[]         @relation("SaleCashier")
   stockMovements StockMovement[]
+  auditLogs      AuditLog[]
 
   @@index([tenantId, role])
   @@index([email])
@@ -447,4 +450,28 @@ model PurchaseOrderItem {
 
   @@index([orderId])
   @@map("purchase_order_items")
+}
+
+// ─────────────────────────────────────────────────────────────
+//  AUDIT LOGS
+// ─────────────────────────────────────────────────────────────
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  tenantId   String?
+  userId     String?
+  action     String
+  resource   String
+  resourceId String?
+  details    Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([tenantId, createdAt])
+  @@index([userId])
+  @@index([action, resource])
+  @@map("audit_logs")
 }

@@ -37,6 +37,21 @@ export class AuthController {
     }
   };
 
+  loginWith2FA = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { userId, token } = z
+        .object({
+          userId: z.string(),
+          token: z.string().length(6),
+        })
+        .parse(req.body);
+      const result = await this.service.loginWith2FA(userId, token);
+      apiResponse.success(res, result);
+    } catch (err) {
+      next(err);
+    }
+  };
+
   refresh = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { refreshToken } = refreshSchema.parse(req.body);

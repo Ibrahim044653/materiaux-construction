@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MatériauxPro — Scénario de démonstration</title>
+<style>
+  /* ── Variables ─────────────────────────────────────── */
+  :root {
+    --blue:    #2563eb;
+    --blue-lt: #eff6ff;
+    --blue-dk: #1e40af;
+    --orange:  #f97316;
+    --green:   #16a34a;
+    --green-lt:#f0fdf4;
+    --red:     #dc2626;
+    --red-lt:  #fef2f2;
+    --amber:   #d97706;
+    --amber-lt:#fffbeb;
+    --gray:    #6b7280;
+    --gray-lt: #f9fafb;
+    --dark:    #111827;
+    --border:  #e5e7eb;
+  }
+
+  /* ── Reset & base ──────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; color: var(--dark); background: #fff; line-height: 1.5; }
+
+  /* ── Page layout ───────────────────────────────────── */
+  .page { max-width: 780px; margin: 0 auto; padding: 32px 40px; }
+
+  /* ── Cover ─────────────────────────────────────────── */
+  .cover {
+    background: linear-gradient(135deg, var(--blue-dk) 0%, var(--blue) 60%, #60a5fa 100%);
+    color: #fff;
+    border-radius: 16px;
+    padding: 48px 40px 40px;
+    margin-bottom: 36px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute; top: -60px; right: -60px;
+    width: 220px; height: 220px;
+    background: rgba(255,255,255,.07);
+    border-radius: 50%;
+  }
+  .cover::after {
+    content: '';
+    position: absolute; bottom: -40px; left: -30px;
+    width: 160px; height: 160px;
+    background: rgba(255,255,255,.05);
+    border-radius: 50%;
+  }
+  .cover-logo { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; }
+  .cover-logo-icon {
+    width: 48px; height: 48px; border-radius: 12px;
+    background: rgba(255,255,255,.2); display: flex; align-items: center;
+    justify-content: center; font-size: 22px; font-weight: 900;
+  }
+  .cover-logo-name { font-size: 22px; font-weight: 700; letter-spacing: -.3px; }
+  .cover h1 { font-size: 28px; font-weight: 800; margin-bottom: 8px; line-height: 1.2; }
+  .cover-sub { font-size: 13px; opacity: .8; margin-bottom: 28px; }
+  .cover-meta { display: flex; gap: 20px; flex-wrap: wrap; }
+  .cover-badge {
+    background: rgba(255,255,255,.15); border-radius: 8px;
+    padding: 6px 14px; font-size: 11px; font-weight: 600;
+  }
+
+  /* ── Credentials box ───────────────────────────────── */
+  .creds {
+    background: var(--gray-lt); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px 20px; margin-bottom: 28px;
+  }
+  .creds h3 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--gray); margin-bottom: 10px; }
+  .creds table { width: 100%; border-collapse: collapse; }
+  .creds td { padding: 5px 10px 5px 0; font-size: 9.5pt; }
+  .creds td:first-child { color: var(--gray); font-weight: 600; width: 110px; }
+  .creds .tag {
+    display: inline-block; background: var(--blue-lt); color: var(--blue-dk);
+    border-radius: 5px; padding: 1px 8px; font-family: 'Courier New', monospace; font-size: 9pt;
+  }
+  .role-badge {
+    display: inline-block; font-size: 8.5pt; font-weight: 600; border-radius: 4px; padding: 1px 8px;
+  }
+  .role-admin   { background: #faf5ff; color: #7c3aed; }
+  .role-owner   { background: var(--amber-lt); color: var(--amber); }
+  .role-manager { background: var(--blue-lt); color: var(--blue-dk); }
+  .role-cashier { background: var(--green-lt); color: var(--green); }
+
+  /* ── Section / Act ─────────────────────────────────── */
+  .act { margin-bottom: 30px; break-inside: avoid; }
+  .act-header {
+    display: flex; align-items: center; gap: 12px;
+    border-bottom: 2px solid var(--blue); padding-bottom: 8px; margin-bottom: 14px;
+  }
+  .act-number {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--blue); color: #fff;
+    font-weight: 800; font-size: 15px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .act-title { font-size: 15px; font-weight: 700; color: var(--dark); }
+  .act-duration { margin-left: auto; font-size: 9.5pt; color: var(--gray); font-weight: 600; }
+
+  /* ── Context callout ───────────────────────────────── */
+  .callout {
+    border-left: 3px solid var(--orange);
+    background: #fff7ed; padding: 10px 14px;
+    border-radius: 0 8px 8px 0; margin-bottom: 12px;
+    font-size: 9.5pt; font-style: italic; color: #9a3412;
+  }
+
+  /* ── Steps ─────────────────────────────────────────── */
+  ol.steps { padding-left: 0; list-style: none; counter-reset: step; }
+  ol.steps li {
+    counter-increment: step; padding: 6px 0 6px 32px; position: relative;
+    font-size: 9.5pt; border-bottom: 1px dashed #e5e7eb;
+  }
+  ol.steps li:last-child { border-bottom: none; }
+  ol.steps li::before {
+    content: counter(step);
+    position: absolute; left: 0; top: 7px;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--blue-lt); color: var(--blue-dk);
+    font-size: 8.5pt; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* ── Result box ────────────────────────────────────── */
+  .result {
+    background: var(--green-lt); border: 1px solid #bbf7d0;
+    border-radius: 8px; padding: 10px 14px; margin-top: 10px;
+    font-size: 9pt;
+  }
+  .result-title { font-weight: 700; color: var(--green); margin-bottom: 4px; font-size: 9pt; }
+  .result ul { padding-left: 16px; }
+  .result li { margin-bottom: 2px; color: #166534; }
+
+  /* ── Tables ─────────────────────────────────────────── */
+  table.data { width: 100%; border-collapse: collapse; font-size: 9.5pt; margin: 10px 0; }
+  table.data th {
+    background: var(--blue); color: #fff; padding: 6px 10px;
+    text-align: left; font-size: 9pt; font-weight: 600;
+  }
+  table.data th:first-child { border-radius: 6px 0 0 0; }
+  table.data th:last-child  { border-radius: 0 6px 0 0; }
+  table.data td { padding: 6px 10px; border-bottom: 1px solid var(--border); }
+  table.data tr:nth-child(even) td { background: var(--gray-lt); }
+  table.data td.num { text-align: right; font-family: 'Courier New', monospace; font-weight: 600; color: var(--blue-dk); }
+  table.data td.total { color: var(--green); font-weight: 700; }
+
+  /* ── Note ───────────────────────────────────────────── */
+  .note {
+    background: var(--blue-lt); border: 1px solid #bfdbfe;
+    border-radius: 8px; padding: 8px 14px; margin: 8px 0;
+    font-size: 9pt; color: #1e40af;
+  }
+  .note strong { color: var(--blue-dk); }
+
+  /* ── FAQ ────────────────────────────────────────────── */
+  .faq { margin-bottom: 28px; }
+  .faq h2 { font-size: 16px; font-weight: 700; margin-bottom: 14px; color: var(--dark); border-bottom: 2px solid var(--border); padding-bottom: 6px; }
+  .faq-item { margin-bottom: 10px; border-radius: 8px; border: 1px solid var(--border); overflow: hidden; }
+  .faq-q { background: var(--gray-lt); padding: 8px 14px; font-weight: 600; font-size: 9.5pt; color: var(--dark); }
+  .faq-a { padding: 8px 14px; font-size: 9pt; color: #374151; }
+
+  /* ── Checklist ──────────────────────────────────────── */
+  .checklist { margin-bottom: 28px; }
+  .checklist h2 { font-size: 16px; font-weight: 700; margin-bottom: 14px; color: var(--dark); border-bottom: 2px solid var(--border); padding-bottom: 6px; }
+  .check-item { display: flex; align-items: flex-start; gap: 10px; padding: 7px 0; border-bottom: 1px dashed var(--border); font-size: 9.5pt; }
+  .check-item:last-child { border-bottom: none; }
+  .checkbox { width: 16px; height: 16px; border: 2px solid var(--blue); border-radius: 4px; flex-shrink: 0; margin-top: 1px; }
+
+  /* ── Code block ─────────────────────────────────────── */
+  .code-block {
+    background: #1e293b; color: #e2e8f0; border-radius: 8px;
+    padding: 14px 18px; font-family: 'Courier New', monospace;
+    font-size: 9pt; white-space: pre; overflow-x: auto;
+    margin: 8px 0;
+  }
+  .code-block .comment { color: #94a3b8; }
+  .code-block .cmd { color: #7dd3fc; }
+
+  /* ── Status badges ───────────────────────────────────── */
+  .badge {
+    display: inline-block; font-size: 8pt; font-weight: 700;
+    border-radius: 4px; padding: 1px 8px;
+  }
+  .badge-sent     { background: var(--amber-lt); color: var(--amber); }
+  .badge-received { background: var(--green-lt); color: var(--green); }
+  .badge-credit   { background: var(--red-lt); color: var(--red); }
+  .badge-done     { background: var(--blue-lt); color: var(--blue-dk); }
+
+  /* ── Footer ─────────────────────────────────────────── */
+  .footer {
+    margin-top: 40px; padding-top: 16px; border-top: 2px solid var(--border);
+    font-size: 9pt; color: var(--gray); text-align: center;
+  }
+
+  /* ── Print ──────────────────────────────────────────── */
+  @media print {
+    body { font-size: 9.5pt; }
+    .page { padding: 0; max-width: 100%; }
+    .cover { border-radius: 0; margin-bottom: 24px; }
+    .act { break-inside: avoid; }
+    .no-print { display: none; }
+    a { color: inherit; text-decoration: none; }
+    @page { margin: 18mm 15mm; size: A4; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ══ COVER ══════════════════════════════════════════════════════ -->
+  <div class="cover">
+    <div class="cover-logo">
+      <div class="cover-logo-icon">MP</div>
+      <div class="cover-logo-name">MatériauxPro</div>
+    </div>
+    <h1>Scénario de démonstration client</h1>
+    <p class="cover-sub">SaaS de gestion pour les quincailleries &amp; magasins de matériaux de construction — Abidjan, Côte d'Ivoire</p>
+    <div class="cover-meta">
+      <div class="cover-badge">⏱ 30 – 45 minutes</div>
+      <div class="cover-badge">📱 Mobile-first</div>
+      <div class="cover-badge">🏪 Multi-magasins</div>
+      <div class="cover-badge">🇨🇮 Interface française</div>
+    </div>
+  </div>
+
+  <!-- ══ COMPTES D'ACCÈS ════════════════════════════════════════════ -->
+  <div class="creds">
+    <h3>Accès de démonstration</h3>
+    <table>
+      <tr>
+        <td><span class="role-badge role-admin">Super Admin</span></td>
+        <td>http://localhost:3002</td>
+        <td><span class="tag">admin@materiaux.com</span></td>
+        <td><span class="tag">Admin1234!</span></td>
+      </tr>
+      <tr>
+        <td><span class="role-badge role-owner">Propriétaire</span></td>
+        <td>http://localhost:5173</td>
+        <td><span class="tag">proprietaire@demo.com</span></td>
+        <td><span class="tag">Demo1234!</span></td>
+      </tr>
+      <tr>
+        <td><span class="role-badge role-manager">Gérant</span></td>
+        <td>http://localhost:5173</td>
+        <td><span class="tag">manager@demo.com</span></td>
+        <td><span class="tag">Demo1234!</span></td>
+      </tr>
+      <tr>
+        <td><span class="role-badge role-cashier">Caissier</span></td>
+        <td>http://localhost:5173</td>
+        <td><span class="tag">caissier@demo.com</span></td>
+        <td><span class="tag">Demo1234!</span></td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- ══ CONTEXTE ═══════════════════════════════════════════════════ -->
+  <div class="callout">
+    🏪 <strong>Contexte :</strong> Nous sommes dans la quincaillerie <em>COULIBALY &amp; Frères</em>, Cocody, Abidjan.
+    C'est lundi matin. Le gérant ouvre la boutique, réceptionne une livraison de ciment, réalise plusieurs ventes,
+    encaisse un remboursement de dette client, puis consulte les chiffres du jour.
+  </div>
+
+  <!-- ══ ACTE 1 ═════════════════════════════════════════════════════ -->
+  <div class="act">
+    <div class="act-header">
+      <div class="act-number">1</div>
+      <div class="act-title">Connexion et tableau de bord</div>
+      <div class="act-duration">⏱ 3 min</div>
+    </div>
+    <ol class="steps">
+      <li>Ouvrir <strong>http://localhost:5173</strong> sur mobile ou en mode responsive 390px dans Chrome.</li>
+      <li>Saisir : <span class="tag">manager@demo.com</span> / <span class="tag">Demo1234!</span> → <strong>Se connecter</strong>.</li>
+      <li>Le tableau de bord s'affiche : CA du jour, ventes, alertes stock, créances clients.</li>
+      <li>Montrer le <strong>sélecteur de magasin</strong> (haut à droite) — basculer entre <em>Cocody</em> et <em>Abobo</em>.</li>
+      <li>Cliquer sur une alerte stock rouge → redirige vers la page Stock.</li>
+    </ol>
+    <div class="note"><strong>💡 À souligner :</strong> les KPIs se mettent à jour en temps réel. Chaque caissier connecté depuis un autre onglet impacte les chiffres instantanément.</div>
+  </div>
+
+  <!-- ══ ACTE 2 ═════════════════════════════════════════════════════ -->
+  <div class="act">
+    <div class="act-header">
+      <div class="act-number">2</div>
+      <div class="act-title">Réception d'une livraison fournisseur</div>
+      <div class="act-duration">⏱ 5 min</div>
+    </div>
+    <div class="callout">📦 Le fournisseur DANGOTE Ciments livre 200 sacs de ciment commandés la semaine dernière.</div>
+    <ol class="steps">
+      <li>Menu → <strong>Fournisseurs</strong> → onglet <strong>Bons de commande</strong>.</li>
+      <li>Repérer la commande <strong>BC-2025-00002</strong> avec le badge <span class="badge badge-sent">EN ATTENTE</span>.</li>
+      <li>Cliquer <strong>Réceptionner la marchandise</strong> (bouton vert).</li>
+      <li>La fenêtre de réception affiche les 4 articles commandés avec quantités.</li>
+      <li>Vérifier les quantités (ici tout conforme), cliquer <strong>Confirmer la réception</strong>.</li>
+    </ol>
+
+    <div style="margin: 10px 0;">
+      <table class="data">
+        <tr><th>Article</th><th>Qté commandée</th><th>Prix unitaire</th><th>Montant</th></tr>
+        <tr><td>Ciment Portland CPJ 42,5</td><td class="num">200 sacs</td><td class="num">4 200 FCFA</td><td class="num total">840 000 FCFA</td></tr>
+        <tr><td>Fer à béton Ø10mm × 12m</td><td class="num">40 barres</td><td class="num">8 000 FCFA</td><td class="num total">320 000 FCFA</td></tr>
+        <tr><td>Tôle galvanisée 0,5mm</td><td class="num">50 feuilles</td><td class="num">3 200 FCFA</td><td class="num total">160 000 FCFA</td></tr>
+        <tr><td>Gravier 15/25</td><td class="num">11 m³</td><td class="num">15 000 FCFA</td><td class="num total">165 000 FCFA</td></tr>
+        <tr><td colspan="3" style="text-align:right;font-weight:700;">Total commande</td><td class="num total" style="color:var(--blue-dk);">1 485 000 FCFA</td></tr>
+      </table>
+    </div>
+
+    <div class="result">
+      <div class="result-title">✅ Ce qui se passe automatiquement</div>
+      <ul>
+        <li>Le stock de chaque article est incrémenté en temps réel.</li>
+        <li>Un mouvement de stock <strong>ENTRÉE</strong> est tracé avec date, heure, utilisateur.</li>
+        <li>La commande passe au statut <span class="badge badge-received">REÇUE</span>.</li>
+        <li>Les alertes stock sur ces produits disparaissent du tableau de bord.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ══ ACTE 3 ═════════════════════════════════════════════════════ -->
+  <div class="act">
+    <div class="act-header">
+      <div class="act-number">3</div>
+      <div class="act-title">Vente complète au comptoir (Caisse POS)</div>
+      <div class="act-duration">⏱ 8 min</div>
+    </div>
+    <div class="callout">🛒 M. Koné Amadou achète des matériaux pour construire sa clôture.</div>
+
+    <ol class="steps">
+      <li>Menu → <strong>Caisse</strong>. La page POS s'affiche : barre de recherche à gauche, panier à droite.</li>
+      <li>Taper <strong>"ciment"</strong> dans la recherche → sélectionner <em>Ciment Portland CPJ 42,5</em> → panier.</li>
+      <li>Ajuster à <strong>10 sacs</strong> avec les boutons + / −. Appliquer une remise de <strong>500 FCFA</strong>.</li>
+      <li>Taper <strong>"fer 12"</strong> → ajouter <em>Fer à béton Ø12mm</em>, quantité <strong>3 barres</strong>.</li>
+      <li>Taper <strong>"gravier"</strong> → ajouter <em>Gravier 15/25</em>, quantité <strong>2 m³</strong>.</li>
+      <li>Cliquer <strong>Ajouter un client</strong> → chercher "Koné" → sélectionner <em>Koné Amadou</em>.</li>
+      <li>Cliquer <strong>Encaisser</strong> → mode de paiement <strong>Espèces</strong> → saisir le montant reçu → valider.</li>
+      <li>Menu → <strong>Ventes</strong> → trouver le ticket → <strong>Reçu PDF</strong>.</li>
+    </ol>
+
+    <table class="data" style="margin:10px 0;">
+      <tr><th>Article</th><th>Qté</th><th>Prix unit.</th><th>Remise</th><th>Total</th></tr>
+      <tr><td>Ciment Portland CPJ 42,5</td><td class="num">10 sacs</td><td class="num">5 500</td><td class="num" style="color:var(--red);">− 500</td><td class="num total">54 500 FCFA</td></tr>
+      <tr><td>Fer à béton Ø12mm × 12m</td><td class="num">3 barres</td><td class="num">14 500</td><td class="num">—</td><td class="num total">43 500 FCFA</td></tr>
+      <tr><td>Gravier 15/25 – m³</td><td class="num">2 m³</td><td class="num">20 000</td><td class="num">—</td><td class="num total">40 000 FCFA</td></tr>
+      <tr><td colspan="4" style="text-align:right;font-weight:700;">TOTAL</td><td class="num total" style="color:var(--blue-dk);font-size:11pt;">138 000 FCFA</td></tr>
+    </table>
+
+    <div class="note"><strong>💡 À souligner :</strong> le stock est décrémenté dès la validation. Si le stock est insuffisant, l'application bloque la vente avec un message d'erreur clair.</div>
+  </div>
+
+  <!-- ══ ACTE 4 ═════════════════════════════════════════════════════ -->
+  <div class="act">
+    <div class="act-header">
+      <div class="act-number">4</div>
+      <div class="act-title">Vente à crédit partiel</div>
+      <div class="act-duration">⏱ 3 min</div>
+    </div>
+    <div class="callout">💳 Mme Traoré Mariam prend 20 sacs de ciment mais ne peut payer qu'une partie aujourd'hui.</div>
+    <ol class="steps">
+      <li>Caisse → ajouter <em>Ciment Portland CPJ 42,5</em> × 20 sacs → total : <strong>110 000 FCFA</strong>.</li>
+      <li>Associer la cliente <strong>Traoré Mariam</strong> (son solde de dette apparaît en rouge).</li>
+      <li>Mode de paiement → <strong>Crédit client</strong>.</li>
+      <li>Montant payé : <strong>50 000 FCFA</strong> → reste dû calculé automatiquement : <strong>60 000 FCFA</strong>.</li>
+      <li>Valider. La vente s'enregistre avec le statut <span class="badge badge-credit">CRÉDIT EN COURS</span>.</li>
+    </ol>
+    <div class="result">
+      <div class="result-title">✅ Résultat</div>
+      <ul>
+        <li>Le solde de Mme Traoré augmente de 60 000 FCFA.</li>
+        <li>La créance apparaît dans le tableau de bord et le rapport de dettes.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ══ ACTE 5 ═════════════════════════════════════════════════════ -->
+  <div class="act">
+    <div class="act-header">
+      <div class="act-number">5</div>
+      <div class="act-title">Encaissement d'une dette client</div>
+      <div class="act-duration">⏱ 3 min</div>
+    </div>
+    <div class="callout">💰 Mme Traoré revient dans l'après-midi pour rembourser une partie de sa dette.</div>
+    <ol class="steps">
+      <li>Menu → <strong>Clients</strong> → chercher <strong>"Traoré"</strong>.</li>
+      <li>Sur la fiche, cliquer l'icône <strong>paiement</strong> (carte bancaire).</li>
+      <li>Saisir : montant <strong>100 000 FCFA</strong>, mode <strong>Orange Money</strong>.</li>
+      <li>Valider. Le solde est mis à jour instantanément.</li>
+    </ol>
+    <div class="note"><strong>💡 À souligner :</strong> l'historique complet des paiements est consultable sur la fiche client. Les créances sont centralisées pour le comptable.</div>
+  </div>
+
+  <!-- ══ ACTE 6 ═════════════════════════════════════════════════════ -->
+  <div class="act">
+    <div class="act-header">
+      <div class="act-number">6</div>
+      <div class="act-title">Gestion du stock</div>
+      <div class="act-duration">⏱ 3 min</div>
+    </div>
+    <ol class="steps">
+      <li>Menu → <strong>Stock</strong> → onglet <strong>Stocks</strong> : quantités en temps réel par magasin.</li>
+      <li>Onglet <strong>Alertes</strong> : produits sous le seuil minimum (badge rouge sur le tableau de bord).</li>
+      <li>Onglet <strong>Mouvements</strong> : historique complet — entrées, sorties, ajustements, transferts.</li>
+      <li>Cliquer <strong>Ajustement</strong> → saisir un produit, la nouvelle quantité corrigée, et un motif.</li>
+      <li>Cliquer <strong>Transfert</strong> → déplacer du stock entre Cocody et Abobo.</li>
+    </ol>
+    <div class="note"><strong>💡 À souligner :</strong> chaque ajustement est tracé avec l'identité de l'utilisateur. Aucune modification n'est anonyme — c'est un outil d'audit pour le propriétaire.</div>
+  </div>
+
+  <!-- ══ ACTE 7 ═════════════════════════════════════════════════════ -->
+  <div class="act">
+    <div class="act-header">
+      <div class="act-number">7</div>
+      <div class="act-title">Rapports de fin de journée</div>
+      <div class="act-duration">⏱ 5 min</div>
+    </div>
+    <ol class="steps">
+      <li>Menu → <strong>Rapports</strong> → onglet <strong>Ventes</strong> → période <em>Aujourd'hui</em>.</li>
+      <li>Lire le CA total, nombre de ventes, panier moyen, graphique par heure.</li>
+      <li>Onglet <strong>Trésorerie</strong> → encaissements, coût des achats, <strong>marge brute</strong> et <strong>% marge</strong>.</li>
+      <li>Onglet <strong>Dettes</strong> → liste des clients débiteurs + total créances.</li>
+      <li>Cliquer <strong>Exporter Excel</strong> → fichier téléchargé en quelques secondes.</li>
+    </ol>
+    <div class="result">
+      <div class="result-title">✅ Ce que contient l'export Excel</div>
+      <ul>
+        <li>Toutes les ventes de la période avec détail par article.</li>
+        <li>Répartition par mode de paiement (Espèces, Orange Money, Wave, MTN Money…).</li>
+        <li>Tableau des créances clients avec numéro de téléphone.</li>
+      </ul>
+    </div>
+    <div class="note"><strong>💡 À souligner :</strong> le fichier Excel peut être envoyé directement par WhatsApp au comptable ou à l'expert-comptable.</div>
+  </div>
+
+  <!-- ══ ACTE 8 ═════════════════════════════════════════════════════ -->
+  <div class="act">
+    <div class="act-header">
+      <div class="act-number">8</div>
+      <div class="act-title">Panneau d'administration multi-boutiques</div>
+      <div class="act-duration">⏱ 5 min (optionnel)</div>
+    </div>
+    <div class="callout">🏢 Pour un groupement de quincailleries ou un franchiseur souhaitant piloter plusieurs points de vente.</div>
+    <ol class="steps">
+      <li>Ouvrir <strong>http://localhost:3002</strong> → connexion Super Admin.</li>
+      <li>Tableau de bord : nombre de boutiques actives, utilisateurs, CA consolidé du réseau.</li>
+      <li><strong>Boutiques</strong> → créer une nouvelle enseigne, choisir le plan (Starter / Pro / Enterprise), activer ou suspendre.</li>
+      <li><strong>Utilisateurs</strong> → voir tous les gérants et caissiers, leur boutique, leur rôle, leur dernière connexion.</li>
+      <li><strong>Journaux d'audit</strong> → chaque action sensible (connexion, modif de prix, suppression) est enregistrée avec l'IP et l'heure.</li>
+    </ol>
+  </div>
+
+  <!-- ══ FAQ ════════════════════════════════════════════════════════ -->
+  <div class="faq">
+    <h2>Questions fréquentes &amp; réponses</h2>
+
+    <div class="faq-item">
+      <div class="faq-q">❓ Et si la connexion internet coupe pendant une vente ?</div>
+      <div class="faq-a">L'application est une PWA (Progressive Web App) installable sur téléphone. En cas de coupure réseau, les données déjà chargées restent accessibles. La synchronisation reprend automatiquement dès le retour du réseau. Pour les zones à faible couverture, nous recommandons une connexion Wi-Fi locale (box 4G partagée en boutique).</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">❓ Peut-on avoir plusieurs caissiers en même temps ?</div>
+      <div class="faq-a">Oui. Chaque caissier a son propre compte sécurisé. Les ventes sont enregistrées simultanément sur plusieurs caisses, et le stock est mis à jour en temps réel pour tous les utilisateurs connectés.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">❓ Les données sont-elles sécurisées ?</div>
+      <div class="faq-a">Chaque boutique est isolée dans son propre espace de données (architecture multi-tenant). Les mots de passe sont chiffrés (bcrypt). Les sessions expirent automatiquement après 15 minutes d'inactivité. Le compte est bloqué après 5 tentatives de connexion incorrectes.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">❓ On peut utiliser ça sur un téléphone Android ?</div>
+      <div class="faq-a">Oui, c'est conçu mobile-first (375px minimum). L'application s'installe comme une application native sur Android et iPhone via le navigateur Chrome. Elle fonctionne sur les appareils d'entrée de gamme courants en Côte d'Ivoire (Tecno, Itel, Samsung A-series).</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">❓ Si je modifie un prix de vente, les anciennes factures changent-elles ?</div>
+      <div class="faq-a">Non. Chaque ligne de vente conserve le prix au moment exact de la transaction. L'historique est immuable et fidèle à ce qui a été encaissé.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">❓ Peut-on gérer plusieurs magasins depuis un seul compte propriétaire ?</div>
+      <div class="faq-a">Oui. Le propriétaire voit tous ses magasins depuis un seul compte, peut basculer entre eux avec le sélecteur en haut de page. Les rapports peuvent être filtrés par magasin ou consolidés sur l'ensemble du réseau.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">❓ Peut-on recevoir des alertes quand le stock est bas ?</div>
+      <div class="faq-a">Oui. L'application envoie des notifications push sur le téléphone du gérant dès qu'un produit passe sous son seuil minimum. Ces alertes fonctionnent même si l'application est fermée (via les notifications web).</div>
+    </div>
+  </div>
+
+  <!-- ══ CHECKLIST ══════════════════════════════════════════════════ -->
+  <div class="checklist">
+    <h2>✅ Checklist avant la démo</h2>
+    <div class="check-item"><div class="checkbox"></div><span>PostgreSQL démarré sur le poste</span></div>
+    <div class="check-item"><div class="checkbox"></div><span>API démarrée sur le port 5000 (terminal : <code>pnpm dev</code> dans <code>apps/api</code>)</span></div>
+    <div class="check-item"><div class="checkbox"></div><span>Frontend web démarré sur le port 5173 (<code>pnpm dev</code> dans <code>apps/web</code>)</span></div>
+    <div class="check-item"><div class="checkbox"></div><span>Frontend admin démarré sur le port 3002 (<code>pnpm dev</code> dans <code>apps/admin</code>)</span></div>
+    <div class="check-item"><div class="checkbox"></div><span>Données de démo chargées (<code>pnpm db:seed</code> dans <code>apps/api</code>)</span></div>
+    <div class="check-item"><div class="checkbox"></div><span>Navigateur ouvert sur http://localhost:5173 en mode responsive 390px</span></div>
+    <div class="check-item"><div class="checkbox"></div><span>Réseau Chrome réglé sur "Fast 3G" pour simuler les conditions terrain</span></div>
+    <div class="check-item"><div class="checkbox"></div><span>Écran du téléphone/PC branché au vidéoprojecteur ou TV</span></div>
+  </div>
+
+  <!-- ══ DÉMARRAGE RAPIDE ═══════════════════════════════════════════ -->
+  <div style="margin-bottom:28px;">
+    <h2 style="font-size:16px;font-weight:700;margin-bottom:12px;border-bottom:2px solid var(--border);padding-bottom:6px;">⚡ Démarrage rapide (PowerShell)</h2>
+    <div class="code-block"><span class="comment"># 1. Démarrer PostgreSQL</span>
+<span class="cmd">& "C:\Program Files\PostgreSQL\16\bin\pg_ctl.exe" start `
+  -D "$env:USERPROFILE\postgresql\data" `
+  -l "$env:USERPROFILE\postgresql\postgresql.log"</span>
+
+<span class="comment"># 2. Se placer à la racine du projet</span>
+<span class="cmd">cd "C:\Users\ibrahim.coulibaly\Materiaux Construction\materiaux-construction"</span>
+
+<span class="comment"># 3. Charger les données de démo (une seule fois)</span>
+<span class="cmd">cd apps/api ; pnpm db:seed ; cd ../..</span>
+
+<span class="comment"># 4. Démarrer tous les services en parallèle (API + Web + Admin)</span>
+<span class="cmd">pnpm dev</span></div>
+  </div>
+
+  <!-- ══ FOOTER ═════════════════════════════════════════════════════ -->
+  <div class="footer">
+    <strong>MatériauxPro</strong> — SaaS de gestion pour quincailleries &amp; matériaux de construction<br/>
+    Document confidentiel · Usage interne · Démo client
+  </div>
+
+</div>
+
+<div class="no-print" style="position:fixed;bottom:20px;right:20px;">
+  <button onclick="window.print()"
+    style="background:var(--blue);color:#fff;border:none;border-radius:10px;padding:12px 22px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(37,99,235,.4);">
+    🖨️ Imprimer / Sauvegarder en PDF
+  </button>
+</div>
+</body>
+</html>
