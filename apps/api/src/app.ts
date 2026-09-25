@@ -1,4 +1,4 @@
-import express, { Application, Request, Response, NextFunction } from 'express';
+import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
@@ -9,9 +9,18 @@ import { errorHandler } from './middlewares/errorHandler';
 import { notFound } from './middlewares/notFound';
 import { corsOptions } from './config/cors';
 
-// Routes (ajoutées au fur et à mesure)
+// Routes
 import authRoutes from './routes/auth.routes';
 import tenantRoutes from './routes/tenant.routes';
+import storeRoutes from './routes/store.routes';
+import userRoutes from './routes/user.routes';
+import productRoutes from './routes/product.routes';
+import stockRoutes from './routes/stock.routes';
+import saleRoutes from './routes/sale.routes';
+import customerRoutes from './routes/customer.routes';
+import supplierRoutes from './routes/supplier.routes';
+import dashboardRoutes from './routes/dashboard.routes';
+import reportRoutes from './routes/report.routes';
 
 const app: Application = express();
 
@@ -21,7 +30,7 @@ app.use(cors(corsOptions));
 
 // ── Rate limiting global ──────────────────────────────────────────────────────
 const globalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
+  windowMs: 15 * 60 * 1000,
   max: 300,
   standardHeaders: true,
   legacyHeaders: false,
@@ -31,7 +40,7 @@ app.use(globalLimiter);
 
 // ── Auth rate limiter (plus strict) ──────────────────────────────────────────
 export const authLimiter = rateLimit({
-  windowMs: 30 * 60 * 1000, // 30 minutes
+  windowMs: 30 * 60 * 1000,
   max: 5,
   skipSuccessfulRequests: true,
   message: {
@@ -60,10 +69,19 @@ app.get('/health', (_req: Request, res: Response) => {
 });
 
 // ── Routes API ────────────────────────────────────────────────────────────────
-const API_PREFIX = '/api/v1';
+const V1 = '/api/v1';
 
-app.use(`${API_PREFIX}/auth`, authRoutes);
-app.use(`${API_PREFIX}/tenants`, tenantRoutes);
+app.use(`${V1}/auth`, authRoutes);
+app.use(`${V1}/tenants`, tenantRoutes);
+app.use(`${V1}/stores`, storeRoutes);
+app.use(`${V1}/users`, userRoutes);
+app.use(`${V1}/products`, productRoutes);
+app.use(`${V1}/stock`, stockRoutes);
+app.use(`${V1}/sales`, saleRoutes);
+app.use(`${V1}/customers`, customerRoutes);
+app.use(`${V1}/suppliers`, supplierRoutes);
+app.use(`${V1}/dashboard`, dashboardRoutes);
+app.use(`${V1}/reports`, reportRoutes);
 
 // ── 404 + Gestionnaire d'erreurs ──────────────────────────────────────────────
 app.use(notFound);
