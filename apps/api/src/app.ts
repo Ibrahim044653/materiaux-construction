@@ -62,7 +62,12 @@ if (process.env.NODE_ENV !== 'test') {
 
 // ── Health check ──────────────────────────────────────────────────────────────
 const healthHandler = (_req: Request, res: Response) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  const dbUrl = process.env.DATABASE_URL ?? '';
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    db: dbUrl ? `${dbUrl.substring(0, 15)}... (len=${dbUrl.length})` : 'NOT SET',
+  });
 };
 app.get('/health', healthHandler);
 app.get('/api/v1/health', healthHandler);
