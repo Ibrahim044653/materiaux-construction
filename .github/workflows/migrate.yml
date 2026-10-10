@@ -1,0 +1,61 @@
+name: Migrate production database
+
+# Vercel redeploie l'API a chaque push sur master. Sans migration jouee en
+# meme temps, le code deploye peut attendre un schema que la base n'a pas
+# encore : c'est exactement la panne survenue le 10/10/2026. Ce workflow
+# applique les migrations en attente. `prisma migrate deploy` est idempotent,
+# les migrations deja appliquees sont ignorees.
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: migrate-production
+  cancel-in-progress: false # ne jamais interrompre une migration en cours
+
+env:
+  NODE_VERSION: "20"
+  PNPM_VERSION: "9"
+
+jobs:
+  migrate:
+    name: Prisma migrate deploy
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check that DATABASE_URL is configured
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::error::Le secret DATABASE_URL est absent. Ajoutez-le dans Settings > Environments > production > Secrets."
+            exit 1
+          fi
+          echo "DATABASE_URL present (longueur ${#DATABASE_URL})"
+
+      - name: Show pending migrations
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: pnpm --filter @boutikpro/api exec prisma migrate status
+        continue-on-error: true # informatif : sort en erreur s'il reste des migrations
+
+      - name: Apply migrations
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: pnpm --filter @boutikpro/api exec prisma migrate deploy
