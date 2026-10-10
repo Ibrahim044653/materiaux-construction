@@ -57,3 +57,4 @@ prisma/migrations/dev.db
 
 # Document commercial genere : il se declare confidentiel, le depot est public
 GUIDE_PRESENTATION_CLIENT.pdf
+DEMO_PROSPECT.pdf
