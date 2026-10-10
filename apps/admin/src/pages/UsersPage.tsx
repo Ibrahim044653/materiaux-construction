@@ -36,7 +36,8 @@ export default function UsersPage() {
   }>({
     queryKey: ['admin', 'users', search, page],
     queryFn: async () => {
-      const res = await api.get('/users', { params: { search, page, perPage: 20 } });
+      // /users est cloisonnee par boutique : le super admin passe par /admin/users
+      const res = await api.get('/admin/users', { params: { search, page, perPage: 20 } });
       return res.data as {
         data: User[];
         meta: { total: number; page: number; perPage: number; totalPages: number };
