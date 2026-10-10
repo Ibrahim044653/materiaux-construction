@@ -14,6 +14,9 @@ import { TableSkeleton } from '../../components/ui/Skeleton';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { Modal } from '../../components/ui/Modal';
 import { Input } from '../../components/ui/Input';
+import { Select } from '../../components/ui/Select';
+import { useProducts } from '../../hooks/useProducts';
+import { useStores } from '../../hooks/useStores';
 import { Badge } from '../../components/ui/Badge';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -402,6 +405,12 @@ function AdjustmentModal({
     formState: { errors },
   } = useForm<AdjustFormValues>({ resolver: zodResolver(adjustFormSchema) });
 
+  // Le gestionnaire choisit un produit, il ne saisit pas d'identifiant
+  const { data: produits } = useProducts({ perPage: 200 });
+  const optionsProduits = (
+    (produits?.data ?? []) as { id: string; name: string; reference: string }[]
+  ).map((pr) => ({ value: pr.id, label: `${pr.name} (${pr.reference})` }));
+
   const onSubmit = async (values: AdjustFormValues) => {
     await adjust.mutateAsync({ ...values, storeId });
     reset();
@@ -425,8 +434,10 @@ function AdjustmentModal({
       }
     >
       <form className="space-y-4">
-        <Input
-          label="ID Produit *"
+        <Select
+          label="Produit *"
+          options={optionsProduits}
+          placeholder="Choisir un produit…"
           error={errors.productId?.message as string}
           {...register('productId')}
         />
@@ -467,6 +478,13 @@ function TransferModal({
     formState: { errors },
   } = useForm<TransferFormValues>({ resolver: zodResolver(transferSchema) });
 
+  const { data: produits } = useProducts({ perPage: 200 });
+  const optionsProduits = (
+    (produits?.data ?? []) as { id: string; name: string; reference: string }[]
+  ).map((pr) => ({ value: pr.id, label: `${pr.name} (${pr.reference})` }));
+  const { data: magasins = [] } = useStores();
+  const optionsMagasins = magasins.map((m) => ({ value: m.id, label: m.name }));
+
   const onSubmit = async (values: TransferFormValues) => {
     await transfer.mutateAsync({
       ...values,
@@ -493,19 +511,25 @@ function TransferModal({
       }
     >
       <form className="space-y-4">
-        <Input
-          label="Magasin source (ID)"
-          error={errors.fromStoreId?.message as string}
+        <Select
+          label="Magasin source *"
+          options={optionsMagasins}
+          placeholder="Choisir…"
           defaultValue={storeId ?? ''}
+          error={errors.fromStoreId?.message as string}
           {...register('fromStoreId')}
         />
-        <Input
-          label="Magasin destination (ID)"
+        <Select
+          label="Magasin destination *"
+          options={optionsMagasins}
+          placeholder="Choisir…"
           error={errors.toStoreId?.message as string}
           {...register('toStoreId')}
         />
-        <Input
-          label="Produit (ID)"
+        <Select
+          label="Produit *"
+          options={optionsProduits}
+          placeholder="Choisir un produit…"
           error={errors.productId?.message as string}
           {...register('productId')}
         />

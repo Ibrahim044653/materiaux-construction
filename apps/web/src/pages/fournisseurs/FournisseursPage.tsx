@@ -16,6 +16,9 @@ import { EmptyState } from '../../components/ui/EmptyState';
 import { SearchBar } from '../../components/ui/SearchBar';
 import { Modal } from '../../components/ui/Modal';
 import { Input } from '../../components/ui/Input';
+import { Select } from '../../components/ui/Select';
+import { useProducts } from '../../hooks/useProducts';
+import { useStores } from '../../hooks/useStores';
 import { StatusBadge } from '../../components/ui/Badge';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useAuthStore } from '../../stores/authStore';
@@ -429,6 +432,14 @@ function PurchaseOrderModal({
     formState: { errors },
   } = useForm<OrderFormValues>({ resolver: zodResolver(orderSchema) });
 
+  // Listes plutot que des identifiants a coller
+  const { data: produits } = useProducts({ perPage: 200 });
+  const optionsProduits = (
+    (produits?.data ?? []) as { id: string; name: string; reference: string }[]
+  ).map((pr) => ({ value: pr.id, label: `${pr.name} (${pr.reference})` }));
+  const { data: magasins = [] } = useStores();
+  const optionsMagasins = magasins.map((m) => ({ value: m.id, label: m.name }));
+
   const onSubmit = async (values: OrderFormValues) => {
     await createOrder.mutateAsync({
       supplierId: values.supplierId,
@@ -472,14 +483,18 @@ function PurchaseOrderModal({
             <p className="text-xs text-danger-600 mt-1">{errors.supplierId.message as string}</p>
           )}
         </div>
-        <Input
-          label="Magasin (ID)"
+        <Select
+          label="Magasin de livraison *"
+          options={optionsMagasins}
+          placeholder="Choisir…"
           defaultValue={storeId ?? ''}
           error={errors.storeId?.message as string}
           {...register('storeId')}
         />
-        <Input
-          label="Produit (ID)"
+        <Select
+          label="Produit *"
+          options={optionsProduits}
+          placeholder="Choisir un produit…"
           error={errors.productId?.message as string}
           {...register('productId')}
         />
