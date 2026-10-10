@@ -1,6 +1,6 @@
 {
   "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
-  "buildCommand": "cd ../.. && pnpm --filter @boutikpro/shared build && pnpm --filter @boutikpro/web build",
+  "buildCommand": "export VITE_API_URL=\"${VITE_API_URL:-https://boutikpro.vercel.app}\" && cd ../.. && pnpm --filter @boutikpro/shared build && pnpm --filter @boutikpro/web build",
   "outputDirectory": "dist",
   "framework": null,
   "rewrites": [
