@@ -88,7 +88,7 @@ export default function MagasinsPage() {
         <div>
           <h1 className="text-xl font-bold text-gray-900">Mes magasins</h1>
           <p className="text-sm text-gray-500">
-            Chaque magasin a son propre stock, ses ventes et ses caissiers.
+            Chaque magasin a son propre stock, ses ventes et ses rapports.
           </p>
         </div>
         <button onClick={openCreate} className="btn btn-primary flex items-center gap-2">

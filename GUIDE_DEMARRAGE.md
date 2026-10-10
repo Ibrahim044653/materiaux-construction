@@ -44,7 +44,7 @@ Le magasin saisi à l'inscription est déjà là. Cliquez sur **Modifier** pour
 compléter son adresse et son téléphone.
 
 Si vous avez un second point de vente, **Nouveau** : chaque magasin aura son
-propre stock, ses propres ventes et ses propres caissiers.
+propre stock, ses propres ventes et ses propres rapports.
 
 ---
 
@@ -216,23 +216,22 @@ Votre liste de relance.
 
 ---
 
-## Étape 11 — Donner un accès à votre caissier
+## Étape 11 — Donner un accès à un collaborateur
 
 **Menu → Utilisateurs → Nouveau**
 
 Son nom, son email, un mot de passe, et son rôle :
 
-| Rôle          | Ce qu'il voit                                                        |
-| ------------- | -------------------------------------------------------------------- |
-| **Gérant**    | Tout l'exploitation d'un magasin : ventes, stock, commandes, clients |
-| **Caissier**  | La caisse, les ventes, les produits et les clients                   |
-| **Comptable** | Les rapports, la trésorerie, les créances, les exports               |
+| Rôle             | Ce qu'il voit                                          |
+| ---------------- | ------------------------------------------------------ |
+| **Propriétaire** | Accès total, y compris les marges et les utilisateurs  |
+| **Comptable**    | Les rapports, la trésorerie, les créances, les exports |
 
 Le champ **Magasin** le rattache à un point de vente précis ; laissez-le vide
 pour un accès à tous.
 
-> **Votre caissier ne verra jamais vos prix d'achat ni vos marges.** Vous
-> déléguez l'encaissement sans déléguer le secret de vos prix.
+> **Votre comptable ne peut rien modifier dans vos ventes.** Il consulte et
+> exporte, sans toucher à la caisse ni au stock.
 
 ---
 
@@ -256,8 +255,8 @@ Ajoutez le site à votre écran d'accueil : il s'installe comme une vraie
 application. Les dernières données consultées restent affichées et la
 synchronisation reprend au retour du réseau.
 
-**« Plusieurs caissiers en même temps ? »**
-Oui, chacun avec son compte. Le stock se met à jour en temps réel pour tous.
+**« Plusieurs personnes connectées en même temps ? »**
+Oui, chacune avec son compte. Le stock se met à jour en temps réel pour tous.
 
 **« Si je change le prix d'un produit, mes anciennes ventes changent ? »**
 Non. Chaque ligne de vente conserve le prix du jour où elle a eu lieu.

@@ -24,12 +24,16 @@ import { Alert } from '../../components/ui/Alert';
 import { Badge } from '../../components/ui/Badge';
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 
+// Tous les roles que l'API connait, pour l'affichage des comptes existants.
 const ROLES: { value: UserRole; label: string; hint: string }[] = [
   { value: 'OWNER', label: 'Propriétaire', hint: 'Accès total, y compris marges et utilisateurs' },
   { value: 'MANAGER', label: 'Gérant', hint: 'Exploitation complète : ventes, stock, commandes' },
   { value: 'CASHIER', label: 'Caissier', hint: 'Caisse, ventes, consultation produits et clients' },
   { value: 'ACCOUNTANT', label: 'Comptable', hint: 'Rapports, trésorerie, créances, exports' },
 ];
+
+// Roles proposes a la creation. Gerant et Caissier sont retires du formulaire.
+const ROLES_ATTRIBUABLES: UserRole[] = ['OWNER', 'ACCOUNTANT'];
 
 const roleLabel = (role: string) => ROLES.find((r) => r.value === role)?.label ?? role;
 
@@ -75,11 +79,15 @@ export default function UtilisateursPage() {
   });
 
   const openCreate = () => {
-    reset({ name: '', email: '', phone: '', role: 'CASHIER', password: '', storeId: '' });
+    reset({ name: '', email: '', phone: '', role: 'ACCOUNTANT', password: '', storeId: '' });
     setEditUser(null);
     setError(null);
     setFormOpen(true);
   };
+
+  const rolesProposes = ROLES.filter(
+    (r) => ROLES_ATTRIBUABLES.includes(r.value) || r.value === editUser?.role
+  );
 
   const openEdit = (u: TeamUser) => {
     reset({
@@ -270,7 +278,7 @@ export default function UtilisateursPage() {
           )}
           <Select
             label="Rôle *"
-            options={ROLES.map((r) => ({ value: r.value, label: r.label }))}
+            options={rolesProposes.map((r) => ({ value: r.value, label: r.label }))}
             error={errors.role?.message}
             {...register('role')}
           />
@@ -283,7 +291,7 @@ export default function UtilisateursPage() {
           />
 
           <div className="sm:col-span-2 rounded-xl bg-gray-50 p-3 space-y-1">
-            {ROLES.map((r) => (
+            {rolesProposes.map((r) => (
               <p key={r.value} className="text-xs text-gray-500">
                 <span className="font-medium text-gray-700">{r.label}</span> — {r.hint}
               </p>

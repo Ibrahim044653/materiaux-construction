@@ -92,10 +92,10 @@ boutique » : en une minute vous avez votre espace, vide, rien que pour vous.
 Vos données ne croisent jamais celles d'un autre commerce.
 
 **Ajouter un magasin.** Menu → Magasins. Chaque point de vente a son stock,
-ses ventes et ses caissiers.
+ses ventes et ses rapports.
 
-**Créer un compte pour votre caissier.** Menu → Utilisateurs. Il encaissera
-sans jamais voir vos prix d'achat ni vos marges.
+**Créer un compte pour votre comptable.** Menu → Utilisateurs. Il consulte les
+rapports et les exports, sans toucher ni à la caisse ni au stock.
 
 ---
 
@@ -106,11 +106,11 @@ L'application s'installe sur le téléphone comme une vraie appli. Les dernière
 données consultées restent affichées, et la synchronisation reprend au retour
 du réseau.
 
-**« Mon caissier peut-il voir mes marges ? »**
-Non. Chaque rôle voit ce qui le concerne. Le caissier encaisse, c'est tout.
+**« Mon comptable peut-il modifier mes ventes ? »**
+Non. Chaque rôle voit ce qui le concerne. Le comptable consulte et exporte.
 
-**« Plusieurs caissiers en même temps ? »**
-Oui, chacun avec son compte. Le stock se met à jour en temps réel pour tous.
+**« Plusieurs personnes connectées en même temps ? »**
+Oui, chacune avec son compte. Le stock se met à jour en temps réel pour tous.
 
 **« Si je change le prix d'un produit, mes anciennes ventes bougent ? »**
 Non. Chaque ligne de vente garde le prix du jour où elle a eu lieu.
