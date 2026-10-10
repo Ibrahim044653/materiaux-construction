@@ -10,7 +10,9 @@ export function AuthLayout() {
             <span className="text-2xl font-black text-primary-700">BP</span>
           </div>
           <h1 className="text-2xl font-bold text-white">BoutikPro</h1>
-          <p className="text-primary-200 text-sm mt-1">Gestion de magasins de construction</p>
+          <p className="text-primary-200 text-sm mt-1">
+            Caisse, stock et ventes pour tout commerce
+          </p>
         </div>
         <div className="card shadow-xl">
           <Outlet />
