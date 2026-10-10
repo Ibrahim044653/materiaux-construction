@@ -1,19 +1,20 @@
 # BoutikPro — Guide de Présentation Client
 
-## Application de Gestion de Quincaillerie & Matériaux de Construction
+## Caisse, Stock et Ventes pour tout Commerce de Détail
 
+**Application :** https://boutikpro-web.vercel.app
 **Éditeur :** BoutikPro SaaS
-**Cible :** Quincailleries, dépôts de matériaux et réseaux multi-boutiques — Abidjan / UEMOA
-**Devise :** FCFA (XOF)
+**Cible :** Quincailleries, épiceries, pharmacies, pièces détachées, prêt-à-porter — tout commerce tenant un stock
+**Devise :** FCFA (XOF) — Abidjan / UEMOA
 **Version :** 1.0 — Octobre 2026
 
 ---
 
 ## AVANT-PROPOS
 
-Ce document présente le fonctionnement de BoutikPro à travers le **cycle de vie complet d'une boutique de matériaux**, depuis l'ouverture du compte jusqu'aux rapports de fin de journée. Chaque module est illustré par des actions concrètes, dans l'ordre chronologique où un gérant ou un caissier les utiliserait au quotidien.
+Ce document présente le fonctionnement de BoutikPro à travers le **cycle de vie complet d'une boutique**, depuis la création du compte jusqu'aux rapports de fin de journée. Chaque module est illustré par des actions concrètes, dans l'ordre chronologique où un gérant ou un caissier les utiliserait au quotidien.
 
-Le fil conducteur : la quincaillerie **COULIBALY & Frères**, deux points de vente (Cocody et Abobo), une journée type du lundi matin à la clôture.
+Le fil conducteur : la quincaillerie **COULIBALY & Frères**, deux points de vente (Cocody et Abobo), une journée type du lundi matin à la clôture. Le métier choisi n'est qu'une illustration : l'application ne connaît ni ciment ni fer à béton, elle ne connaît que des produits, des stocks et des ventes. Une pharmacie ou un vendeur de pièces détachées suivrait exactement le même parcours.
 
 ---
 
