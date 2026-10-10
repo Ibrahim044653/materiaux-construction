@@ -51,6 +51,9 @@ prisma/migrations/dev.db
 
 .vercel
 .env*
+# ... mais les modeles doivent rester versionnes
+!.env.example
+!*.env.example
 
 # Document commercial genere : il se declare confidentiel, le depot est public
 GUIDE_PRESENTATION_CLIENT.pdf

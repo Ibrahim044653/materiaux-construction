@@ -10,14 +10,18 @@ export class CategoryService {
     return prisma.category.findMany({
       where: { tenantId, ...(includeInactive ? {} : { isActive: true }) },
       orderBy: [{ position: 'asc' }, { name: 'asc' }],
-      include: { _count: { select: { products: true } } },
+      // Ne compter que les produits encore au catalogue : un produit retire
+      // ne doit pas gonfler le compteur affiche au gestionnaire.
+      include: { _count: { select: { products: { where: { isActive: true } } } } },
     });
   }
 
   async getById(tenantId: string, id: string) {
     const category = await prisma.category.findFirst({
       where: { id, tenantId },
-      include: { _count: { select: { products: true } } },
+      // Ne compter que les produits encore au catalogue : un produit retire
+      // ne doit pas gonfler le compteur affiche au gestionnaire.
+      include: { _count: { select: { products: { where: { isActive: true } } } } },
     });
     if (!category) throw new AppError('Catégorie introuvable', 404);
     return category;
@@ -71,10 +75,16 @@ export class CategoryService {
   }
 
   async delete(tenantId: string, id: string) {
-    const category = await this.getById(tenantId, id);
-    if (category._count.products > 0) {
+    await this.getById(tenantId, id);
+    // Seuls les produits encore au catalogue bloquent la suppression : les
+    // produits retires (isActive = false) rendraient la categorie
+    // definitivement indestructible.
+    const utilises = await prisma.product.count({
+      where: { tenantId, categoryId: id, isActive: true },
+    });
+    if (utilises > 0) {
       throw new AppError(
-        `Impossible de supprimer : ${category._count.products} produit(s) utilisent cette catégorie`,
+        `Impossible de supprimer : ${utilises} produit(s) utilisent cette catégorie`,
         409
       );
     }

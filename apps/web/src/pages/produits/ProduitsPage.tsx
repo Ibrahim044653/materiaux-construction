@@ -63,8 +63,6 @@ export default function ProduitsPage() {
   const [editProduct, setEditProduct] = useState<Product | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  // Le seuil d'alerte vit sur le stock : il n'est connu que si un magasin est sélectionné
-  const [thresholdKnown, setThresholdKnown] = useState(true);
 
   const debouncedSearch = useDebounce(search, 300);
 
@@ -104,13 +102,11 @@ export default function ProduitsPage() {
     });
     setEditProduct(null);
     setError(null);
-    setThresholdKnown(true);
     setFormOpen(true);
   };
 
   const openEdit = (p: Product) => {
     const threshold = p.stockEntries?.[0]?.alertThreshold;
-    setThresholdKnown(threshold !== undefined);
     reset({
       name: p.name,
       reference: p.reference,
@@ -138,8 +134,7 @@ export default function ProduitsPage() {
       sellPrice: values.sellPrice.toFixed(2),
       buyPrice: values.buyPrice.toFixed(2),
       tva: values.tva,
-      // En édition hors contexte magasin, on ne touche pas aux seuils déjà en place
-      ...(thresholdKnown || !editProduct ? { alertThreshold: values.alertThreshold } : {}),
+      alertThreshold: values.alertThreshold,
       description: values.description || undefined,
     };
 
@@ -361,12 +356,7 @@ export default function ProduitsPage() {
           <Input
             label="Stock minimum"
             type="number"
-            disabled={!!editProduct && !thresholdKnown}
-            hint={
-              !!editProduct && !thresholdKnown
-                ? 'Sélectionnez un magasin pour modifier ce seuil'
-                : "Déclenche l'alerte de réapprovisionnement"
-            }
+            hint="Alerte de réapprovisionnement, pour tous vos magasins"
             error={errors.alertThreshold?.message}
             {...register('alertThreshold')}
           />

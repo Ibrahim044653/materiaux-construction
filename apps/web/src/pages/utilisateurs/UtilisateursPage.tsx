@@ -194,8 +194,11 @@ export default function UtilisateursPage() {
                 </p>
                 <p className="text-xs text-gray-400 truncate">{u.email}</p>
               </div>
-              <div className="hidden sm:block">
-                <Badge variant={u.isActive ? 'primary' : 'gray'}>{roleLabel(u.role)}</Badge>
+              <div className="hidden sm:flex items-center gap-1.5">
+                <Badge variant="primary">{roleLabel(u.role)}</Badge>
+                {/* Etat explicite : un simple changement de couleur du role
+                    passait inapercu sur un compte desactive. */}
+                {!u.isActive && <Badge variant="danger">Désactivé</Badge>}
               </div>
               <div className="hidden lg:block text-sm text-gray-500 truncate">
                 {u.store?.name ?? 'Tous'}

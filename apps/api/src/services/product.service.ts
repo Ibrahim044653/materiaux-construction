@@ -55,14 +55,12 @@ export class ProductService {
         orderBy: { name: 'asc' },
         include: {
           category: CATEGORY_SELECT,
-          ...(opts.storeId
-            ? {
-                stockEntries: {
-                  where: { storeId: opts.storeId },
-                  select: { quantity: true, alertThreshold: true },
-                },
-              }
-            : {}),
+          // Toujours renvoye : le seuil d'alerte doit rester lisible et
+          // modifiable meme sans magasin selectionne (boutique mono-magasin).
+          stockEntries: {
+            ...(opts.storeId ? { where: { storeId: opts.storeId } } : {}),
+            select: { storeId: true, quantity: true, alertThreshold: true },
+          },
         },
       }),
       prisma.product.count({ where }),
@@ -93,14 +91,10 @@ export class ProductService {
       take: 20,
       include: {
         category: CATEGORY_SELECT,
-        ...(storeId
-          ? {
-              stockEntries: {
-                where: { storeId },
-                select: { quantity: true, alertThreshold: true },
-              },
-            }
-          : {}),
+        stockEntries: {
+          ...(storeId ? { where: { storeId } } : {}),
+          select: { storeId: true, quantity: true, alertThreshold: true },
+        },
       },
     });
     return products;
@@ -125,8 +119,10 @@ export class ProductService {
     if (existing) throw new AppError('Un produit avec cette référence existe déjà', 409);
     await this.assertCategory(tenantId, input.categoryId);
 
+    // Tous les magasins, y compris desactives : sinon un magasin reactive
+    // plus tard n'aurait aucune ligne de stock pour ce produit.
     const stores = await prisma.store.findMany({
-      where: { tenantId, isActive: true },
+      where: { tenantId },
       select: { id: true },
     });
 
@@ -157,9 +153,16 @@ export class ProductService {
   }
 
   async update(tenantId: string, id: string, input: Partial<CreateInput> & { isActive?: boolean }) {
-    await this.getById(tenantId, id);
+    const current = await this.getById(tenantId, id);
     const data: Prisma.ProductUpdateInput = {};
     if (input.name) data.name = input.name;
+    if (input.reference && input.reference !== current.reference) {
+      const taken = await prisma.product.findUnique({
+        where: { tenantId_reference: { tenantId, reference: input.reference } },
+      });
+      if (taken) throw new AppError('Un produit avec cette référence existe déjà', 409);
+      data.reference = input.reference;
+    }
     if (input.description !== undefined) data.description = input.description;
     if (input.categoryId !== undefined) {
       await this.assertCategory(tenantId, input.categoryId);
@@ -174,6 +177,8 @@ export class ProductService {
     if (input.barcode !== undefined) data.barcode = input.barcode;
     if (input.isActive !== undefined) data.isActive = input.isActive;
 
+    // Le seuil saisi sur la fiche produit vaut pour tous les magasins.
+    // Un reglage magasin par magasin se fait depuis la page Stock.
     if (input.alertThreshold !== undefined) {
       await prisma.stockEntry.updateMany({
         where: { productId: id, tenantId },
