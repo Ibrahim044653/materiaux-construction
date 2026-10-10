@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Search, MoreVertical, CheckCircle, XCircle, Trash2, Plus } from 'lucide-react';
 import { api, getApiError } from '../lib/api';
 import { formatDate } from '../lib/utils';
+import CreateTenantModal from '../components/CreateTenantModal';
 
 interface Tenant {
   id: string;
@@ -32,6 +33,7 @@ export default function TenantsPage() {
   const [search, setSearch] = useState('');
   const [menuId, setMenuId] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<Tenant | null>(null);
+  const [showCreate, setShowCreate] = useState(false);
   const [actionError, setActionError] = useState('');
 
   const { data, isLoading } = useQuery<{ data: Tenant[]; meta: { total: number } }>({
@@ -80,7 +82,10 @@ export default function TenantsPage() {
           <h1 className="text-2xl font-bold text-white">Tenants</h1>
           <p className="text-gray-400 text-sm mt-1">{data?.meta?.total ?? 0} organisations</p>
         </div>
-        <button className="btn btn-primary flex items-center gap-2">
+        <button
+          onClick={() => setShowCreate(true)}
+          className="btn btn-primary flex items-center gap-2"
+        >
           <Plus size={16} />
           Nouveau tenant
         </button>
@@ -211,6 +216,8 @@ export default function TenantsPage() {
           </tbody>
         </table>
       </div>
+
+      {showCreate && <CreateTenantModal onClose={() => setShowCreate(false)} />}
 
       {/* Confirm Delete */}
       {confirmDelete && (

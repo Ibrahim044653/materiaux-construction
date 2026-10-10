@@ -11,6 +11,7 @@ const createSchema = z.object({
   ownerName: z.string().min(2),
   ownerEmail: z.string().email(),
   ownerPassword: z.string().min(8),
+  storeName: z.string().min(2).optional(),
 });
 
 const updateSchema = z.object({

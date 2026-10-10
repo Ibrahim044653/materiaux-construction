@@ -6,6 +6,9 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
+    // Vite transpile : tsc ne sert qu'a verifier les types et ne doit rien
+    // ecrire, sinon le build pollue src/ de .js et .d.ts.
+    "noEmit": true,
     "baseUrl": ".",
     "paths": { "@/*": ["./src/*"] },
     "types": ["vite/client"]

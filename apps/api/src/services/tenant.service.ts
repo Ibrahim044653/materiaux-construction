@@ -10,6 +10,7 @@ type CreateTenantInput = {
   ownerName: string;
   ownerEmail: string;
   ownerPassword: string;
+  storeName?: string;
 };
 
 type UpdateTenantInput = {
@@ -38,6 +39,14 @@ export class TenantService {
     const existing = await prisma.tenant.findUnique({ where: { email: input.email } });
     if (existing) throw new AppError('Un compte avec cet email existe déjà', 409);
 
+    // L'email du propriétaire est unique sur toute la base : on le verifie avant
+    // d'ouvrir la transaction pour renvoyer un message explicite plutot qu'un
+    // conflit Prisma generique.
+    const ownerTaken = await prisma.user.findUnique({
+      where: { email: input.ownerEmail.toLowerCase() },
+    });
+    if (ownerTaken) throw new AppError('Cet email de propriétaire est déjà utilisé', 409);
+
     const passwordHash = await bcrypt.hash(input.ownerPassword, 12);
 
     const tenant = await prisma.$transaction(async (tx) => {
@@ -47,6 +56,17 @@ export class TenantService {
           email: input.email.toLowerCase(),
           phone: input.phone,
           plan: input.plan,
+        },
+      });
+
+      // Un commerce sans point de vente est inexploitable : stock, caisse et
+      // ventes sont tous rattachés à un magasin. On en crée donc un d'office,
+      // comme le fait l'inscription libre.
+      await tx.store.create({
+        data: {
+          tenantId: newTenant.id,
+          name: input.storeName?.trim() || input.name,
+          phone: input.phone,
         },
       });
 
