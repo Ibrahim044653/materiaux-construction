@@ -25,6 +25,8 @@ import reportRoutes from './routes/report.routes';
 import twoFactorRoutes from './routes/twoFactor.routes';
 import auditLogRoutes from './routes/auditLog.routes';
 import adminRoutes from './routes/admin.routes';
+// TEMPORAIRE : a retirer une fois la base de production migree
+import maintenanceRoutes from './routes/maintenance.routes';
 import exportRoutes from './routes/export.routes';
 import pushRoutes from './routes/push.routes';
 
@@ -92,6 +94,7 @@ app.use(`${V1}/reports`, reportRoutes);
 app.use(`${V1}/auth/2fa`, twoFactorRoutes);
 app.use(`${V1}/audit-logs`, auditLogRoutes);
 app.use(`${V1}/admin`, adminRoutes);
+app.use(`${V1}/admin`, maintenanceRoutes); // TEMPORAIRE
 app.use(`${V1}/reports/export`, exportRoutes);
 app.use(`${V1}/push`, pushRoutes);
 

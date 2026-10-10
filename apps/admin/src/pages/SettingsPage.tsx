@@ -6,6 +6,8 @@ import { z } from 'zod';
 import { Shield, Smartphone, CheckCircle, AlertTriangle, Key } from 'lucide-react';
 import { api, getApiError } from '../lib/api';
 import { useAdminStore } from '../stores/adminStore';
+// TEMPORAIRE : a retirer une fois la base de production migree
+import MigrationCard from '../components/MigrationCard';
 
 const enableSchema = z.object({
   token: z.string().length(6, 'Code à 6 chiffres').regex(/^\d+$/, 'Chiffres uniquement'),
@@ -102,6 +104,8 @@ export default function SettingsPage() {
         <h1 className="text-2xl font-bold text-white">Paramètres</h1>
         <p className="text-gray-400 text-sm mt-1">Configuration du compte Super Admin</p>
       </div>
+
+      <MigrationCard />
 
       {/* Profile card */}
       <div className="admin-card">
