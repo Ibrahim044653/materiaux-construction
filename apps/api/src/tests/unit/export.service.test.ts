@@ -37,7 +37,7 @@ const mockStockEntry = {
   product: {
     name: 'Ciment CPA325',
     reference: 'CIM-001',
-    category: 'CIMENT',
+    category: { name: 'Ciment' },
     buyPrice: new Prisma.Decimal(4200),
     sellPrice: new Prisma.Decimal(5000),
     unit: 'sac',

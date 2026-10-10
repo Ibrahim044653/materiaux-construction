@@ -25,7 +25,7 @@ export class TwoFactorService {
   async generateSecret(email: string): Promise<{ secret: string; otpAuthUrl: string }> {
     const auth = await getAuthenticator();
     const secret = auth.generateSecret();
-    const otpAuthUrl = auth.keyuri(email, 'MatériauxPro Admin', secret);
+    const otpAuthUrl = auth.keyuri(email, 'BoutikPro Admin', secret);
     return { secret, otpAuthUrl };
   }
 

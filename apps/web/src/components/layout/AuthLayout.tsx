@@ -7,9 +7,9 @@ export function AuthLayout() {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-2xl shadow-lg mb-4">
-            <span className="text-2xl font-black text-primary-700">MP</span>
+            <span className="text-2xl font-black text-primary-700">BP</span>
           </div>
-          <h1 className="text-2xl font-bold text-white">MatériauxPro</h1>
+          <h1 className="text-2xl font-bold text-white">BoutikPro</h1>
           <p className="text-primary-200 text-sm mt-1">Gestion de magasins de construction</p>
         </div>
         <div className="card shadow-xl">

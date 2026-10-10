@@ -27,8 +27,12 @@ export class ReportService {
         where,
         orderBy: { createdAt: 'asc' },
         select: {
-          id: true, receiptNumber: true, createdAt: true,
-          totalAmount: true, amountPaid: true, amountDue: true,
+          id: true,
+          receiptNumber: true,
+          createdAt: true,
+          totalAmount: true,
+          amountPaid: true,
+          amountDue: true,
           paymentMethod: true,
           cashier: { select: { name: true } },
           store: { select: { name: true } },
@@ -43,7 +47,10 @@ export class ReportService {
     ]);
 
     // Grouper par période
-    const grouped: Record<string, { date: string; count: number; totalAmount: number; amountPaid: number }> = {};
+    const grouped: Record<
+      string,
+      { date: string; count: number; totalAmount: number; amountPaid: number }
+    > = {};
     for (const sale of sales) {
       let key: string;
       if (opts.groupBy === 'month') {
@@ -99,10 +106,20 @@ export class ReportService {
     const entries = await prisma.stockEntry.findMany({
       where: { tenantId, ...(storeId && { storeId }) },
       include: {
-        product: { select: { name: true, reference: true, category: true, buyPrice: true, sellPrice: true, unit: true, isActive: true } },
+        product: {
+          select: {
+            name: true,
+            reference: true,
+            category: { select: { name: true } },
+            buyPrice: true,
+            sellPrice: true,
+            unit: true,
+            isActive: true,
+          },
+        },
         store: { select: { name: true } },
       },
-      orderBy: { product: { category: 'asc' } },
+      orderBy: { product: { category: { name: 'asc' } } },
     });
 
     let totalValueBuy = new Prisma.Decimal(0);
@@ -117,11 +134,13 @@ export class ReportService {
     // Produits à rotation lente (aucun mouvement en 30j)
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    const activeProductIds = await prisma.saleItem.findMany({
-      where: { sale: { tenantId, createdAt: { gte: thirtyDaysAgo } } },
-      select: { productId: true },
-      distinct: ['productId'],
-    }).then((r) => new Set(r.map((i) => i.productId)));
+    const activeProductIds = await prisma.saleItem
+      .findMany({
+        where: { sale: { tenantId, createdAt: { gte: thirtyDaysAgo } } },
+        select: { productId: true },
+        distinct: ['productId'],
+      })
+      .then((r) => new Set(r.map((i) => i.productId)));
 
     for (const entry of entries) {
       if (!activeProductIds.has(entry.productId) && entry.quantity.gt(0)) {
@@ -165,8 +184,9 @@ export class ReportService {
       }),
     ]);
 
-    const recettes = new Prisma.Decimal(salesAgg._sum.amountPaid?.toString() ?? '0')
-      .plus(customerPayments._sum.amount?.toString() ?? '0');
+    const recettes = new Prisma.Decimal(salesAgg._sum.amountPaid?.toString() ?? '0').plus(
+      customerPayments._sum.amount?.toString() ?? '0'
+    );
     const depenses = new Prisma.Decimal(purchaseOrders._sum.totalAmount?.toString() ?? '0');
 
     return {
@@ -192,7 +212,10 @@ export class ReportService {
       },
     });
 
-    const totalDebt = customers.reduce((acc, c) => acc.plus(c.creditBalance), new Prisma.Decimal(0));
+    const totalDebt = customers.reduce(
+      (acc, c) => acc.plus(c.creditBalance),
+      new Prisma.Decimal(0)
+    );
 
     return { customers, totalDebt: totalDebt.toString() };
   }

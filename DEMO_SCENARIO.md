@@ -1,8 +1,8 @@
-# MatériauxPro — Scénario de démonstration client
+# BoutikPro — Scénario de démonstration client
 
 **Durée estimée :** 30 à 45 minutes  
 **Public :** Propriétaire / Gérant d'une quincaillerie  
-**Objectif :** Montrer que MatériauxPro couvre le cycle complet d'une journée de vente, de la réception de marchandise jusqu'aux rapports de fin de journée.
+**Objectif :** Montrer que BoutikPro couvre le cycle complet d'une journée de vente, de la réception de marchandise jusqu'aux rapports de fin de journée.
 
 ---
 

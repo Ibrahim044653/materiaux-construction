@@ -8,6 +8,19 @@ const loginSchema = z.object({
   password: z.string().min(1, 'Mot de passe requis'),
 });
 
+const registerSchema = z.object({
+  shopName: z.string().min(2, 'Nom de la boutique requis').max(80),
+  storeName: z.string().max(80).optional(),
+  ownerName: z.string().min(2, 'Votre nom est requis').max(80),
+  email: z.string().email('Email invalide'),
+  phone: z.string().max(30).optional(),
+  password: z
+    .string()
+    .min(8, 'Le mot de passe doit contenir au moins 8 caractères')
+    .regex(/[A-Z]/, 'Doit contenir une majuscule')
+    .regex(/[0-9]/, 'Doit contenir un chiffre'),
+});
+
 const changePasswordSchema = z.object({
   currentPassword: z.string().min(1),
   newPassword: z
@@ -26,6 +39,16 @@ const refreshSchema = z.object({ refreshToken: z.string().min(1) });
 
 export class AuthController {
   private service = new AuthService();
+
+  register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const body = registerSchema.parse(req.body);
+      const result = await this.service.register(body);
+      apiResponse.created(res, result);
+    } catch (err) {
+      next(err);
+    }
+  };
 
   login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {

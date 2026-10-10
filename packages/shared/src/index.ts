@@ -2,6 +2,7 @@ export * from './types/auth';
 export * from './types/tenant';
 export * from './types/user';
 export * from './types/store';
+export * from './types/category';
 export * from './types/product';
 export * from './types/sale';
 export * from './types/customer';

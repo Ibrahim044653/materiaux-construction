@@ -13,9 +13,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'icons/*.png'],
       manifest: {
-        name: 'MatériauxPro — Gestion de Magasins',
-        short_name: 'MatériauxPro',
-        description: 'Gestion de magasins de matériaux de construction',
+        name: 'BoutikPro — Gestion de Boutiques',
+        short_name: 'BoutikPro',
+        description: 'Caisse, stock et ventes pour tout type de commerce',
         theme_color: '#1e40af',
         background_color: '#ffffff',
         display: 'standalone',

@@ -1,4 +1,4 @@
-# Guide de démarrage rapide — MatériauxPro
+# Guide de démarrage rapide — BoutikPro
 
 ## Prérequis
 
@@ -39,17 +39,17 @@ pnpm db:seed
 pnpm dev
 ```
 
-- API  : http://localhost:3001
-- Web  : http://localhost:5173
+- API : http://localhost:3001
+- Web : http://localhost:5173
 - pgAdmin : http://localhost:5050 (avec `docker compose --profile tools up`)
 
 ## Comptes de démonstration (après seed)
 
-| Rôle         | Email                    | Mot de passe    |
-|--------------|--------------------------|-----------------|
-| Super Admin  | admin@materiaux.pro      | Admin@1234      |
-| Propriétaire | proprietaire@demo.pro    | Owner@1234      |
-| Caissier     | caissier@demo.pro        | Caissier@1234   |
+| Rôle         | Email                 | Mot de passe  |
+| ------------ | --------------------- | ------------- |
+| Super Admin  | admin@materiaux.pro   | Admin@1234    |
+| Propriétaire | proprietaire@demo.pro | Owner@1234    |
+| Caissier     | caissier@demo.pro     | Caissier@1234 |
 
 ## Structure des routes API
 

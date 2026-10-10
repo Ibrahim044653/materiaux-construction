@@ -7,7 +7,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useNavigate, Link } from 'react-router-dom';
 import { api, getApiError } from '../../lib/api';
 import { useAuthStore } from '../../stores/authStore';
-import type { LoginResponse } from '@materiaux/shared';
+import type { LoginResponse } from '@boutikpro/shared';
 
 const schema = z.object({
   email: z.string().email('Email invalide'),
@@ -20,7 +20,12 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const setAuth = useAuthStore((s) => s.setAuth);
 
-  const { register, handleSubmit, formState: { errors }, setError } = useForm<FormData>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setError,
+  } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
 
@@ -49,9 +54,7 @@ export default function LoginPage() {
         )}
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">
-            Adresse email
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">Adresse email</label>
           <input
             {...register('email')}
             type="email"
@@ -59,15 +62,11 @@ export default function LoginPage() {
             placeholder="vous@exemple.com"
             autoComplete="email"
           />
-          {errors.email && (
-            <p className="mt-1 text-xs text-danger-600">{errors.email.message}</p>
-          )}
+          {errors.email && <p className="mt-1 text-xs text-danger-600">{errors.email.message}</p>}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">
-            Mot de passe
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">Mot de passe</label>
           <div className="relative">
             <input
               {...register('password')}
@@ -90,10 +89,7 @@ export default function LoginPage() {
         </div>
 
         <div className="flex justify-end">
-          <Link
-            to="/mot-de-passe-oublie"
-            className="text-sm text-primary-700 hover:underline"
-          >
+          <Link to="/mot-de-passe-oublie" className="text-sm text-primary-700 hover:underline">
             Mot de passe oublié ?
           </Link>
         </div>
@@ -102,6 +98,13 @@ export default function LoginPage() {
           {isPending ? <Loader2 size={18} className="animate-spin" /> : null}
           {isPending ? 'Connexion...' : 'Se connecter'}
         </button>
+
+        <p className="text-sm text-gray-500 text-center">
+          Pas encore de compte ?{' '}
+          <Link to="/inscription" className="text-primary-700 hover:underline">
+            Créer ma boutique
+          </Link>
+        </p>
       </form>
     </div>
   );

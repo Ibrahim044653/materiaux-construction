@@ -87,7 +87,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run Prisma migrations
-        run: pnpm --filter @materiaux/api exec prisma migrate deploy
+        run: pnpm --filter @boutikpro/api exec prisma migrate deploy
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 

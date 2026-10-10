@@ -13,8 +13,8 @@ RUN pnpm install --frozen-lockfile
 COPY packages/shared ./packages/shared
 COPY apps/web ./apps/web
 
-RUN pnpm --filter @materiaux/shared build
-RUN pnpm --filter @materiaux/web build
+RUN pnpm --filter @boutikpro/shared build
+RUN pnpm --filter @boutikpro/web build
 
 # ── Production stage (Nginx) ──────────────────────────
 FROM nginx:alpine AS runner

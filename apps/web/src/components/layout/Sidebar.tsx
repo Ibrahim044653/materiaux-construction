@@ -8,6 +8,8 @@ import {
   Truck,
   BarChart3,
   ClipboardList,
+  Store,
+  UserCog,
   LogOut,
   Settings,
   X,
@@ -26,6 +28,12 @@ const navItems = [
   { to: '/rapports', icon: BarChart3, label: 'Rapports' },
 ];
 
+// Paramétrage de la boutique, réservé au propriétaire
+const ownerNavItems = [
+  { to: '/magasins', icon: Store, label: 'Magasins' },
+  { to: '/utilisateurs', icon: UserCog, label: 'Utilisateurs' },
+];
+
 interface SidebarProps {
   open: boolean;
   onClose: () => void;
@@ -33,6 +41,8 @@ interface SidebarProps {
 
 export function Sidebar({ open, onClose }: SidebarProps) {
   const { user, logout } = useAuthStore();
+  const isOwner = user?.role === 'OWNER' || user?.role === 'SUPER_ADMIN';
+  const items = isOwner ? [...navItems, ...ownerNavItems] : navItems;
 
   return (
     <aside
@@ -45,9 +55,9 @@ export function Sidebar({ open, onClose }: SidebarProps) {
       <div className="flex items-center justify-between p-4 border-b border-primary-800">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 bg-white rounded-xl flex items-center justify-center">
-            <span className="text-sm font-black text-primary-700">MP</span>
+            <span className="text-sm font-black text-primary-700">BP</span>
           </div>
-          <span className="text-white font-bold text-lg">MatériauxPro</span>
+          <span className="text-white font-bold text-lg">BoutikPro</span>
         </div>
         <button
           onClick={onClose}
@@ -59,7 +69,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
 
       {/* Navigation */}
       <nav className="flex-1 py-4 space-y-1 px-2 overflow-y-auto">
-        {navItems.map(({ to, icon: Icon, label }) => (
+        {items.map(({ to, icon: Icon, label }) => (
           <NavLink
             key={to}
             to={to}

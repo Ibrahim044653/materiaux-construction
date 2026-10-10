@@ -88,7 +88,7 @@ export default function LoginPage() {
           <div className="w-16 h-16 bg-primary-700 rounded-2xl flex items-center justify-center mb-4">
             <Shield size={32} className="text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-white">MatériauxPro</h1>
+          <h1 className="text-2xl font-bold text-white">BoutikPro</h1>
           <p className="text-gray-400 text-sm mt-1">Espace Administration</p>
         </div>
 
@@ -213,7 +213,7 @@ export default function LoginPage() {
         </div>
 
         <p className="text-center text-xs text-gray-600 mt-6">
-          Accès réservé — MatériauxPro SaaS Admin
+          Accès réservé — BoutikPro SaaS Admin
         </p>
       </div>
     </div>

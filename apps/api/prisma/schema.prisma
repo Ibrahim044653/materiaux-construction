@@ -37,18 +37,6 @@ enum TenantStatus {
   DELETED
 }
 
-enum ProductCategory {
-  CIMENT
-  FER_BETON
-  TOLE
-  PEINTURE
-  CARRELAGE
-  PLOMBERIE
-  ELECTRICITE
-  BOIS
-  AUTRE
-}
-
 enum PaymentMethod {
   CASH
   ORANGE_MONEY
@@ -97,6 +85,7 @@ model Tenant {
 
   users          User[]
   stores         Store[]
+  categories     Category[]
   products       Product[]
   customers      Customer[]
   suppliers      Supplier[]
@@ -199,25 +188,46 @@ model Store {
 //  PRODUITS & STOCKS
 // ─────────────────────────────────────────────────────────────
 
+// Catégories libres, propres à chaque boutique : une quincaillerie crée
+// « Ciment », une pharmacie « Antibiotiques ». Aucune liste imposée.
+model Category {
+  id        String   @id @default(cuid())
+  tenantId  String
+  name      String
+  color     String?
+  position  Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant   Tenant    @relation(fields: [tenantId], references: [id])
+  products Product[]
+
+  @@unique([tenantId, name])
+  @@index([tenantId])
+  @@map("categories")
+}
+
 model Product {
-  id          String          @id @default(cuid())
+  id          String   @id @default(cuid())
   tenantId    String
+  categoryId  String?
   reference   String
   name        String
-  category    ProductCategory
   description String?
   photo       String?
   barcode     String?
   qrCode      String?
-  buyPrice    Decimal         @db.Decimal(12, 2)
-  sellPrice   Decimal         @db.Decimal(12, 2)
-  tva         Decimal         @default(18) @db.Decimal(5, 2)
-  unit        String          @default("unité")
-  isActive    Boolean         @default(true)
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
+  buyPrice    Decimal  @db.Decimal(12, 2)
+  sellPrice   Decimal  @db.Decimal(12, 2)
+  tva         Decimal  @default(18) @db.Decimal(5, 2)
+  unit        String   @default("unité")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   tenant         Tenant          @relation(fields: [tenantId], references: [id])
+  category       Category?       @relation(fields: [categoryId], references: [id])
   stockEntries   StockEntry[]
   stockMovements StockMovement[]
   saleItems      SaleItem[]
@@ -225,7 +235,7 @@ model Product {
   transferItems  StoreTransferItem[]
 
   @@unique([tenantId, reference])
-  @@index([tenantId, category])
+  @@index([tenantId, categoryId])
   @@index([barcode])
   @@map("products")
 }

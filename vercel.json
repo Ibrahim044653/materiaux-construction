@@ -1,6 +1,12 @@
 {
-  "buildCommand": "pnpm --filter @materiaux/web build",
-  "outputDirectory": "apps/web/dist",
+  "version": 2,
   "installCommand": "pnpm install --frozen-lockfile",
-  "rewrites": [{ "source": "/((?!assets/).*)", "destination": "/index.html" }]
+  "builds": [
+    {
+      "src": "apps/api/src/index.ts",
+      "use": "@vercel/node",
+      "config": { "includeFiles": ["apps/api/prisma/**"] }
+    }
+  ],
+  "routes": [{ "src": "/(.*)", "dest": "apps/api/src/index.ts" }]
 }

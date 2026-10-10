@@ -1,8 +1,8 @@
 {
-  "name": "materiaux-construction",
+  "name": "boutikpro",
   "version": "1.0.0",
   "private": true,
-  "description": "SaaS de gestion de magasins de matériaux de construction",
+  "description": "BoutikPro — SaaS de caisse, stock et ventes pour tout type de commerce",
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",

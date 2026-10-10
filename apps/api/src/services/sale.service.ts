@@ -191,7 +191,11 @@ export class SaleService {
     const sale = await prisma.sale.findFirst({
       where: { id, tenantId },
       include: {
-        items: { include: { product: { select: { name: true, unit: true, category: true } } } },
+        items: {
+          include: {
+            product: { select: { name: true, unit: true, category: { select: { name: true } } } },
+          },
+        },
         cashier: { select: { name: true } },
         customer: { select: { id: true, name: true, phone: true } },
         store: { select: { id: true, name: true, address: true, phone: true } },

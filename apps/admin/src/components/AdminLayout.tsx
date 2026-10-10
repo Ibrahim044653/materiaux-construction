@@ -44,7 +44,7 @@ export function AdminLayout() {
             <Shield size={18} className="text-white" />
           </div>
           <div>
-            <p className="text-white font-bold text-sm leading-tight">MatériauxPro</p>
+            <p className="text-white font-bold text-sm leading-tight">BoutikPro</p>
             <p className="text-gray-400 text-xs">Administration</p>
           </div>
         </div>

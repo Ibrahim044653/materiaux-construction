@@ -1,5 +1,5 @@
 {
-  "name": "@materiaux/admin",
+  "name": "@boutikpro/admin",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -10,7 +10,7 @@
     "lint": "eslint src --ext .ts,.tsx"
   },
   "dependencies": {
-    "@materiaux/shared": "workspace:*",
+    "@boutikpro/shared": "workspace:*",
     "@tanstack/react-query": "^5.50.0",
     "@tanstack/react-query-devtools": "^5.50.0",
     "axios": "^1.7.0",

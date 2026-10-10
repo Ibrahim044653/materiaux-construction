@@ -34,10 +34,10 @@ self.addEventListener('push', (event: PushEvent) => {
   try {
     data = event.data.json() as typeof data;
   } catch {
-    data = { title: 'MatériauxPro', body: event.data.text() };
+    data = { title: 'BoutikPro', body: event.data.text() };
   }
 
-  const title = data.title ?? 'MatériauxPro';
+  const title = data.title ?? 'BoutikPro';
   const options: NotificationOptions = {
     body: data.body ?? '',
     icon: '/icons/icon-192.png',

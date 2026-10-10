@@ -1,15 +1,3 @@
-export const PRODUCT_CATEGORIES = [
-  { value: 'CIMENT', label: 'Ciment' },
-  { value: 'FER_BETON', label: 'Fer à béton' },
-  { value: 'TOLE', label: 'Tôle' },
-  { value: 'PEINTURE', label: 'Peinture' },
-  { value: 'CARRELAGE', label: 'Carrelage' },
-  { value: 'PLOMBERIE', label: 'Plomberie' },
-  { value: 'ELECTRICITE', label: 'Électricité' },
-  { value: 'BOIS', label: 'Bois' },
-  { value: 'AUTRE', label: 'Autre' },
-] as const;
-
 export const PAYMENT_METHODS = [
   { value: 'CASH', label: 'Espèces' },
   { value: 'ORANGE_MONEY', label: 'Orange Money' },

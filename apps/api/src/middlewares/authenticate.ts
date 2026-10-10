@@ -2,16 +2,19 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { jwtConfig } from '../config/jwt';
 import { apiResponse } from '../utils/apiResponse';
-import { Role } from '@materiaux/shared';
+import { Role } from '@boutikpro/shared';
 
 export interface AuthPayload {
-  sub: string;       // userId
+  sub: string; // userId
   tenantId: string;
   role: Role;
-  storeId?: string;  // pour les caissiers/gérants limités à un magasin
+  storeId?: string; // pour les caissiers/gérants limités à un magasin
 }
 
 declare global {
+  // L'augmentation des types d'Express passe obligatoirement par un namespace :
+  // c'est ainsi que @types/express déclare Request.
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     interface Request {
       user?: AuthPayload;

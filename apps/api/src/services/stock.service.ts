@@ -4,7 +4,9 @@ import { AppError } from '../middlewares/errorHandler';
 
 type AdjustInput = { productId: string; storeId: string; quantity: number; reason: string };
 type TransferInput = {
-  fromStoreId: string; toStoreId: string; notes?: string;
+  fromStoreId: string;
+  toStoreId: string;
+  notes?: string;
   items: Array<{ productId: string; quantity: number }>;
 };
 type MovementsOpts = { page: number; perPage: number; storeId?: string; productId?: string };
@@ -14,7 +16,16 @@ export class StockService {
     return prisma.stockEntry.findMany({
       where: { tenantId, ...(storeId && { storeId }) },
       include: {
-        product: { select: { id: true, name: true, reference: true, category: true, unit: true, isActive: true } },
+        product: {
+          select: {
+            id: true,
+            name: true,
+            reference: true,
+            category: { select: { name: true } },
+            unit: true,
+            isActive: true,
+          },
+        },
         store: { select: { id: true, name: true } },
       },
       orderBy: { product: { name: 'asc' } },
@@ -25,7 +36,18 @@ export class StockService {
     // Produits dont la quantité est en dessous du seuil d'alerte
     const entries = await prisma.stockEntry.findMany({
       where: { tenantId, ...(storeId && { storeId }) },
-      include: { product: { select: { id: true, name: true, reference: true, category: true, unit: true } }, store: { select: { id: true, name: true } } },
+      include: {
+        product: {
+          select: {
+            id: true,
+            name: true,
+            reference: true,
+            category: { select: { name: true } },
+            unit: true,
+          },
+        },
+        store: { select: { id: true, name: true } },
+      },
     });
     return entries.filter((e) => e.quantity.lte(e.alertThreshold));
   }
@@ -50,7 +72,15 @@ export class StockService {
       }),
       prisma.stockMovement.count({ where }),
     ]);
-    return { data, meta: { page: opts.page, perPage: opts.perPage, total, totalPages: Math.ceil(total / opts.perPage) } };
+    return {
+      data,
+      meta: {
+        page: opts.page,
+        perPage: opts.perPage,
+        total,
+        totalPages: Math.ceil(total / opts.perPage),
+      },
+    };
   }
 
   async createAdjustment(tenantId: string, userId: string, input: AdjustInput) {
@@ -65,7 +95,13 @@ export class StockService {
     return prisma.$transaction(async (tx) => {
       await tx.stockEntry.upsert({
         where: { productId_storeId: { productId: input.productId, storeId: input.storeId } },
-        create: { tenantId, productId: input.productId, storeId: input.storeId, quantity: newQty, alertThreshold: 5 },
+        create: {
+          tenantId,
+          productId: input.productId,
+          storeId: input.storeId,
+          quantity: newQty,
+          alertThreshold: 5,
+        },
         update: { quantity: newQty },
       });
 
@@ -148,25 +184,49 @@ export class StockService {
       for (const item of transfer.items) {
         // Déduire du stock source
         await tx.stockEntry.update({
-          where: { productId_storeId: { productId: item.productId, storeId: transfer.fromStoreId } },
+          where: {
+            productId_storeId: { productId: item.productId, storeId: transfer.fromStoreId },
+          },
           data: { quantity: { decrement: item.quantity } },
         });
 
         // Ajouter au stock destination
         await tx.stockEntry.upsert({
           where: { productId_storeId: { productId: item.productId, storeId: transfer.toStoreId } },
-          create: { tenantId, productId: item.productId, storeId: transfer.toStoreId, quantity: item.quantity, alertThreshold: 5 },
+          create: {
+            tenantId,
+            productId: item.productId,
+            storeId: transfer.toStoreId,
+            quantity: item.quantity,
+            alertThreshold: 5,
+          },
           update: { quantity: { increment: item.quantity } },
         });
 
         // Mouvement sortie
         await tx.stockMovement.create({
-          data: { tenantId, productId: item.productId, storeId: transfer.fromStoreId, type: 'TRANSFER_OUT', quantity: item.quantity, referenceId: transferId, createdById: userId },
+          data: {
+            tenantId,
+            productId: item.productId,
+            storeId: transfer.fromStoreId,
+            type: 'TRANSFER_OUT',
+            quantity: item.quantity,
+            referenceId: transferId,
+            createdById: userId,
+          },
         });
 
         // Mouvement entrée
         await tx.stockMovement.create({
-          data: { tenantId, productId: item.productId, storeId: transfer.toStoreId, type: 'TRANSFER_IN', quantity: item.quantity, referenceId: transferId, createdById: userId },
+          data: {
+            tenantId,
+            productId: item.productId,
+            storeId: transfer.toStoreId,
+            type: 'TRANSFER_IN',
+            quantity: item.quantity,
+            referenceId: transferId,
+            createdById: userId,
+          },
         });
       }
 
@@ -182,7 +242,10 @@ export class StockService {
       where: { id: transferId, tenantId, status: 'PENDING' },
     });
     if (!transfer) throw new AppError('Transfert introuvable ou déjà traité', 404);
-    return prisma.storeTransfer.update({ where: { id: transferId }, data: { status: 'CANCELLED' } });
+    return prisma.storeTransfer.update({
+      where: { id: transferId },
+      data: { status: 'CANCELLED' },
+    });
   }
 
   // Utilisé par SaleService pour déduire le stock lors d'une vente
@@ -210,7 +273,15 @@ export class StockService {
       });
 
       await tx.stockMovement.create({
-        data: { tenantId, productId: item.productId, storeId, type: 'OUT', quantity: item.quantity, referenceId: saleId, createdById: userId },
+        data: {
+          tenantId,
+          productId: item.productId,
+          storeId,
+          type: 'OUT',
+          quantity: item.quantity,
+          referenceId: saleId,
+          createdById: userId,
+        },
       });
     }
   }
@@ -227,12 +298,26 @@ export class StockService {
     for (const item of items) {
       await tx.stockEntry.upsert({
         where: { productId_storeId: { productId: item.productId, storeId } },
-        create: { tenantId, productId: item.productId, storeId, quantity: item.quantity, alertThreshold: 5 },
+        create: {
+          tenantId,
+          productId: item.productId,
+          storeId,
+          quantity: item.quantity,
+          alertThreshold: 5,
+        },
         update: { quantity: { increment: item.quantity } },
       });
 
       await tx.stockMovement.create({
-        data: { tenantId, productId: item.productId, storeId, type: 'IN', quantity: item.quantity, referenceId: orderId, createdById: userId },
+        data: {
+          tenantId,
+          productId: item.productId,
+          storeId,
+          type: 'IN',
+          quantity: item.quantity,
+          referenceId: orderId,
+          createdById: userId,
+        },
       });
     }
   }

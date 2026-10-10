@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { AuthUser } from '@materiaux/shared';
+import type { AuthUser } from '@boutikpro/shared';
 
 interface AuthState {
   user: AuthUser | null;
@@ -41,7 +41,7 @@ export const useAuthStore = create<AuthState>()(
         }),
     }),
     {
-      name: 'materiaux-auth',
+      name: 'boutikpro-auth',
       // Ne pas persister l'accessToken (court-vécu), seulement le refresh
       partialize: (state) => ({
         user: state.user,

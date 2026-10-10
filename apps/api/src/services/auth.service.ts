@@ -1,12 +1,87 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { Prisma } from '@prisma/client';
 import { prisma } from '../config/prisma';
 import { jwtConfig } from '../config/jwt';
 import { AppError } from '../middlewares/errorHandler';
 import { AuthPayload } from '../middlewares/authenticate';
-import { Role } from '@materiaux/shared';
+import { Role } from '@boutikpro/shared';
 
 export class AuthService {
+  // Création autonome d'une boutique : tenant + premier magasin + compte propriétaire,
+  // le tout dans une transaction pour ne jamais laisser de boutique à moitié créée.
+  async register(input: {
+    shopName: string;
+    storeName?: string;
+    ownerName: string;
+    email: string;
+    phone?: string;
+    password: string;
+  }) {
+    const email = input.email.toLowerCase();
+
+    const [existingUser, existingTenant] = await Promise.all([
+      prisma.user.findUnique({ where: { email } }),
+      prisma.tenant.findUnique({ where: { email } }),
+    ]);
+    if (existingUser || existingTenant) {
+      throw new AppError('Un compte existe déjà avec cet email', 409);
+    }
+
+    const passwordHash = await bcrypt.hash(input.password, 12);
+
+    let owner;
+    try {
+      owner = await prisma.$transaction(async (tx) => {
+        const tenant = await tx.tenant.create({
+          data: {
+            name: input.shopName,
+            email,
+            phone: input.phone,
+            plan: 'STARTER',
+            status: 'ACTIVE',
+          },
+        });
+
+        await tx.store.create({
+          data: {
+            tenantId: tenant.id,
+            name: input.storeName?.trim() || input.shopName,
+            phone: input.phone,
+          },
+        });
+
+        return tx.user.create({
+          data: {
+            tenantId: tenant.id,
+            // Pas de magasin imposé : le propriétaire voit tous ses points de vente
+            storeId: null,
+            email,
+            name: input.ownerName,
+            phone: input.phone,
+            role: 'OWNER',
+            passwordHash,
+          },
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            role: true,
+            tenantId: true,
+            storeId: true,
+          },
+        });
+      });
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+        throw new AppError('Un compte existe déjà avec cet email', 409);
+      }
+      throw err;
+    }
+
+    return this._issueTokens(owner);
+  }
+
   async login(email: string, password: string) {
     const rows = await prisma.$queryRawUnsafe<
       {

@@ -49,7 +49,7 @@ export class ExportService {
     });
 
     const workbook = new ExcelJS.Workbook();
-    workbook.creator = 'MatériauxPro';
+    workbook.creator = 'BoutikPro';
     workbook.created = new Date();
 
     const ws = workbook.addWorksheet('Ventes');
@@ -127,7 +127,7 @@ export class ExportService {
           select: {
             name: true,
             reference: true,
-            category: true,
+            category: { select: { name: true } },
             buyPrice: true,
             sellPrice: true,
             unit: true,
@@ -135,12 +135,12 @@ export class ExportService {
         },
         store: { select: { name: true } },
       },
-      orderBy: [{ product: { category: 'asc' } }, { product: { name: 'asc' } }],
+      orderBy: [{ product: { category: { name: 'asc' } } }, { product: { name: 'asc' } }],
       take: 10000,
     });
 
     const workbook = new ExcelJS.Workbook();
-    workbook.creator = 'MatériauxPro';
+    workbook.creator = 'BoutikPro';
     workbook.created = new Date();
 
     const ws = workbook.addWorksheet('Stock');
@@ -168,7 +168,7 @@ export class ExportService {
       const rowData = ws.addRow({
         ref: e.product.reference,
         name: e.product.name,
-        cat: e.product.category,
+        cat: e.product.category?.name ?? '',
         store: (e.store as { name: string }).name,
         unit: e.product.unit,
         qty,
@@ -214,7 +214,7 @@ export class ExportService {
     });
 
     const workbook = new ExcelJS.Workbook();
-    workbook.creator = 'MatériauxPro';
+    workbook.creator = 'BoutikPro';
     workbook.created = new Date();
 
     const ws = workbook.addWorksheet('Créances Clients');

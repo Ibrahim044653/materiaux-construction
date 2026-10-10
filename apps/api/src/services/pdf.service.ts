@@ -156,7 +156,7 @@ export class PdfService {
       doc
         .fontSize(7)
         .font('Helvetica')
-        .text("MatériauxPro — Abidjan, Côte d'Ivoire", { align: 'center' });
+        .text("BoutikPro — Abidjan, Côte d'Ivoire", { align: 'center' });
 
       doc.flushPages();
       doc.end();

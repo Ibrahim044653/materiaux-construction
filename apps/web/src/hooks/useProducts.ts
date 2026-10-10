@@ -4,9 +4,9 @@ import { api } from '../lib/api';
 interface ProductFilters {
   storeId?: string | null;
   search?: string;
-  category?: string;
+  categoryId?: string;
   page?: number;
-  limit?: number;
+  perPage?: number;
 }
 
 export function useProducts(filters: ProductFilters = {}) {
@@ -17,9 +17,9 @@ export function useProducts(filters: ProductFilters = {}) {
         params: {
           ...(filters.storeId ? { storeId: filters.storeId } : {}),
           ...(filters.search ? { q: filters.search } : {}),
-          ...(filters.category ? { category: filters.category } : {}),
+          ...(filters.categoryId ? { categoryId: filters.categoryId } : {}),
           page: filters.page ?? 1,
-          limit: filters.limit ?? 20,
+          perPage: filters.perPage ?? 20,
         },
       });
       return res.data as { data: unknown[]; meta: { totalPages: number; total: number } };

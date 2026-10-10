@@ -7,7 +7,7 @@ const config: Config = {
   testMatch: ['**/*.test.ts'],
   transform: { '^.+\\.ts$': ['ts-jest', { tsconfig: 'tsconfig.test.json' }] },
   moduleNameMapper: {
-    '^@materiaux/shared$': '<rootDir>/../../packages/shared/src/index.ts',
+    '^@boutikpro/shared$': '<rootDir>/../../packages/shared/src/index.ts',
   },
   clearMocks: true,
   resetMocks: false,

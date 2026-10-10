@@ -48,3 +48,6 @@ prisma/migrations/dev.db
 
 # TypeScript
 *.tsbuildinfo
+
+.vercel
+.env*

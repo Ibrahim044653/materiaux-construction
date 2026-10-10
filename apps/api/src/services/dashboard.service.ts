@@ -25,40 +25,35 @@ export class DashboardService {
       ...(storeId && { storeId }),
     };
 
-    const [
-      todaySales,
-      todaySalesCount,
-      totalDebt,
-      criticalStockCount,
-      pendingTransfers,
-    ] = await Promise.all([
-      // CA du jour
-      prisma.sale.aggregate({
-        where: { ...saleWhere, createdAt: { gte: today, lt: tomorrow } },
-        _sum: { totalAmount: true },
-      }),
-      // Nombre de ventes du jour
-      prisma.sale.count({
-        where: { ...saleWhere, createdAt: { gte: today, lt: tomorrow } },
-      }),
-      // Total des créances clients
-      prisma.customer.aggregate({
-        where: { tenantId },
-        _sum: { creditBalance: true },
-      }),
-      // Produits en stock critique
-      prisma.$queryRaw<[{ count: bigint }]>`
+    const [todaySales, todaySalesCount, totalDebt, criticalStockCount, pendingTransfers] =
+      await Promise.all([
+        // CA du jour
+        prisma.sale.aggregate({
+          where: { ...saleWhere, createdAt: { gte: today, lt: tomorrow } },
+          _sum: { totalAmount: true },
+        }),
+        // Nombre de ventes du jour
+        prisma.sale.count({
+          where: { ...saleWhere, createdAt: { gte: today, lt: tomorrow } },
+        }),
+        // Total des créances clients
+        prisma.customer.aggregate({
+          where: { tenantId },
+          _sum: { creditBalance: true },
+        }),
+        // Produits en stock critique
+        prisma.$queryRaw<[{ count: bigint }]>`
         SELECT COUNT(*) as count
         FROM stock_entries
         WHERE "tenantId" = ${tenantId}
         ${storeId ? Prisma.sql`AND "storeId" = ${storeId}` : Prisma.empty}
         AND quantity <= "alertThreshold"
       `,
-      // Transferts en attente
-      prisma.storeTransfer.count({
-        where: { tenantId, status: 'PENDING' },
-      }),
-    ]);
+        // Transferts en attente
+        prisma.storeTransfer.count({
+          where: { tenantId, status: 'PENDING' },
+        }),
+      ]);
 
     return {
       caJour: todaySales._sum.totalAmount?.toString() ?? '0',
@@ -110,15 +105,26 @@ export class DashboardService {
           ...(storeId && { storeId }),
         },
       },
-      include: { product: { select: { name: true, category: true, unit: true } } },
+      include: {
+        product: { select: { name: true, unit: true, category: { select: { name: true } } } },
+      },
     });
 
     // Agréger par produit
-    const agg: Record<string, { name: string; category: string; unit: string; totalQty: number; totalRevenue: number }> = {};
+    const agg: Record<
+      string,
+      { name: string; category: string; unit: string; totalQty: number; totalRevenue: number }
+    > = {};
     for (const item of items) {
       const id = item.productId;
       if (!agg[id]) {
-        agg[id] = { name: item.product.name, category: item.product.category, unit: item.product.unit, totalQty: 0, totalRevenue: 0 };
+        agg[id] = {
+          name: item.product.name,
+          category: item.product.category?.name ?? '',
+          unit: item.product.unit,
+          totalQty: 0,
+          totalRevenue: 0,
+        };
       }
       agg[id].totalQty += Number(item.quantity);
       agg[id].totalRevenue += Number(item.total);
@@ -133,15 +139,22 @@ export class DashboardService {
   async getAlerts(tenantId: string, storeId?: string) {
     const [stockAlerts, unpaidSales, pendingOrders] = await Promise.all([
       // Stock critique
-      prisma.stockEntry.findMany({
-        where: {
-          tenantId,
-          ...(storeId && { storeId }),
-        },
-        include: { product: { select: { name: true, reference: true, unit: true } }, store: { select: { name: true } } },
-      }).then((entries) => entries.filter((e) => e.quantity.lte(e.alertThreshold))),
+      prisma.stockEntry
+        .findMany({
+          where: {
+            tenantId,
+            ...(storeId && { storeId }),
+          },
+          include: {
+            product: { select: { name: true, reference: true, unit: true } },
+            store: { select: { name: true } },
+          },
+        })
+        .then((entries) => entries.filter((e) => e.quantity.lte(e.alertThreshold))),
       // Ventes impayées (crédit client)
-      prisma.sale.count({ where: { tenantId, status: 'PENDING_CREDIT', ...(storeId && { storeId }) } }),
+      prisma.sale.count({
+        where: { tenantId, status: 'PENDING_CREDIT', ...(storeId && { storeId }) },
+      }),
       // Commandes fournisseurs en attente
       prisma.purchaseOrder.count({ where: { tenantId, status: { in: ['DRAFT', 'SENT'] } } }),
     ]);
