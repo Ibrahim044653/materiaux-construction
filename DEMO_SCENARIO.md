@@ -17,10 +17,10 @@
 
 ## Accès de démonstration
 
-| Rôle         | URL                   | Email               | Mot de passe |
-| ------------ | --------------------- | ------------------- | ------------ |
-| Gérant (web) | http://localhost:5173 | manager@demo.com    | Demo1234!    |
-| Super Admin  | http://localhost:3002 | admin@materiaux.com | Admin1234!   |
+| Rôle         | URL                   | Email               | Mot de passe          |
+| ------------ | --------------------- | ------------------- | --------------------- |
+| Gérant (web) | http://localhost:5173 | manager@demo.com    | communiqué séparément |
+| Super Admin  | http://localhost:3002 | admin@materiaux.com | communiqué séparément |
 
 ---
 

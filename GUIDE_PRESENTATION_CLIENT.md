@@ -503,13 +503,13 @@ TABLEAU DE BORD   RAPPORTS ─── Ventes · Trésorerie / Marge · Dettes
 
 ## ACCÈS DE DÉMONSTRATION
 
-| Profil            | Email                 | Mot de passe | Ce qu'il voit                                             |
-| ----------------- | --------------------- | ------------ | --------------------------------------------------------- |
-| Propriétaire      | proprietaire@demo.com | Demo1234!    | Tous ses magasins, marges, rapports consolidés            |
-| Gérant            | manager@demo.com      | Demo1234!    | Exploitation complète : caisse, stock, commandes, clients |
-| Caissier (Cocody) | caissier@demo.com     | Demo1234!    | Caisse, ventes, produits, clients                         |
-| Caissier (Abobo)  | caissier2@demo.com    | Demo1234!    | Caisse du magasin d'Abobo                                 |
-| Super Admin       | admin@materiaux.com   | Admin1234!   | Pilotage du réseau de boutiques                           |
+| Profil            | Email                 | Mot de passe          | Ce qu'il voit                                             |
+| ----------------- | --------------------- | --------------------- | --------------------------------------------------------- |
+| Propriétaire      | proprietaire@demo.com | communiqué séparément | Tous ses magasins, marges, rapports consolidés            |
+| Gérant            | manager@demo.com      | communiqué séparément | Exploitation complète : caisse, stock, commandes, clients |
+| Caissier (Cocody) | caissier@demo.com     | communiqué séparément | Caisse, ventes, produits, clients                         |
+| Caissier (Abobo)  | caissier2@demo.com    | communiqué séparément | Caisse du magasin d'Abobo                                 |
+| Super Admin       | admin@materiaux.com   | communiqué séparément | Pilotage du réseau de boutiques                           |
 
 > Le jeu de démonstration contient la quincaillerie **COULIBALY & Frères** (plan PRO) avec **2 magasins**, **18 références** réparties sur 9 catégories, **24 clients** (dont plusieurs avec créances en cours), **6 fournisseurs** et un **historique de ventes sur 4 semaines** — tous modes de paiement représentés, ventes à crédit incluses, pour illustrer chaque module en situation réelle.
 
