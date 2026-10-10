@@ -63,11 +63,12 @@ if (process.env.NODE_ENV !== 'test') {
 
 // ── Health check ──────────────────────────────────────────────────────────────
 const healthHandler = (_req: Request, res: Response) => {
-  const dbUrl = process.env.DATABASE_URL ?? '';
+  // Cette route est publique : ne jamais y exposer de fragment de la chaine
+  // de connexion ni sa longueur. On se limite a « configuree ou non ».
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
-    db: dbUrl ? `${dbUrl.substring(0, 15)}... (len=${dbUrl.length})` : 'NOT SET',
+    db: process.env.DATABASE_URL ? 'configured' : 'NOT SET',
   });
 };
 app.get('/health', healthHandler);
