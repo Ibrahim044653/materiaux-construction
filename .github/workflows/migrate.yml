@@ -24,7 +24,9 @@ jobs:
   migrate:
     name: Prisma migrate deploy
     runs-on: ubuntu-latest
-    environment: production
+    # Pas d'`environment:` ici : le secret est lu au niveau du depot, ce qui
+    # evite de dependre d'un environnement precis et de ses eventuels
+    # relecteurs obligatoires.
     steps:
       - uses: actions/checkout@v4
 
@@ -43,7 +45,7 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           if [ -z "$DATABASE_URL" ]; then
-            echo "::error::Le secret DATABASE_URL est absent. Ajoutez-le dans Settings > Environments > production > Secrets."
+            echo "::error::Secret DATABASE_URL absent. A creer dans Settings > Secrets and variables > Actions > New repository secret (nom exact : DATABASE_URL)."
             exit 1
           fi
           echo "DATABASE_URL present (longueur ${#DATABASE_URL})"
